@@ -1,0 +1,8 @@
+Flask==1.0.2
+six==1.11.0
+Werkzeug==0.14.1
+python-dateutil==2.7.3
+pytz==2018.5
+numpy>=1.14.5
+jsonpickle==0.9.6
+redis

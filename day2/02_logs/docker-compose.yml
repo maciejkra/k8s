@@ -1,0 +1,18 @@
+version: '2'
+services:
+  www:
+    image: httpd
+    ports:
+      - "80:80"
+    depends_on: 
+      - syslog
+    logging:
+      driver: syslog
+      options:
+        syslog-address: "udp://127.0.0.1:5514"
+        tag: "http"
+
+  syslog:
+    image: voxxit/rsyslog 
+    ports:
+        - "5514:514/udp"

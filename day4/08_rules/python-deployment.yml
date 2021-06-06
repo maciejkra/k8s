@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: python-deployment-taints
+  labels:
+    app: python-taints
+spec:
+  replicas: 1
+  strategy:
+   type: RollingUpdate
+   rollingUpdate:
+     maxUnavailable: 1
+     maxSurge: 1 # maximum above no replicas
+  selector:
+    matchLabels:
+      app: python-taints
+  template:
+    metadata:
+      name: python-pod-taints
+      labels:
+        app: python-taints
+    spec:
+      #tolerations:
+      #- key: "key"
+      #  operator: "Exists"
+      #  effect: "NoSchedule"
+      containers:
+      - name: python-container
+        image: krajewskim/python-api:redis
+        ports:
+          - containerPort: 5002

@@ -1,0 +1,25 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: producer
+  labels:
+    project: workshop
+spec:
+  parallelism: 1
+  completions: 1
+  template:
+    metadata:
+      labels:
+        project: workshop
+    spec:
+      containers:
+        - name: producer
+          image: krajewskim/kubernetes:python-redis-consumer-producer
+          env:
+            - name: IS_CONSUMER
+              value: "FALSE"
+            - name: REDIS_HOST
+              value: "redis-service"
+      restartPolicy: Never
+
+

@@ -1,0 +1,30 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: helloapp-fanout-echo-svc
+spec:
+  selector:
+    app: helloapp-fanout-echo-dep
+  ports:
+  - port: 8080
+    targetPort: 8080
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: helloapp-fanout-echo-dep
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: helloapp-fanout-echo-dep
+  template:
+    metadata:
+      labels:
+        app: helloapp-fanout-echo-dep
+    spec:
+      containers:
+      - name: helloapp-fanout-echo-dep
+        image: gcr.io/google_containers/echoserver:1.4
+        ports:
+        - containerPort: 8080

@@ -1,0 +1,21 @@
+version: '2'
+services:
+  one:
+    image: debian
+    command: sleep 9999999
+    networks:
+      net:
+        aliases:
+          - service_one
+
+  two:
+    image: debian
+    command: sleep 9999999
+    networks:
+      net:
+        aliases:
+          - service_two
+
+networks:
+  net:
+    driver: bridge

@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: python-deployment
+  labels:
+    app: python
+spec:
+  replicas: 1
+  strategy:
+   type: RollingUpdate
+   rollingUpdate:
+     maxUnavailable: 1
+     maxSurge: 1 # maximum above no replicas
+  selector:
+    matchLabels:
+      app: python
+  template:
+    metadata:
+      name: python-pod
+      labels:
+        app: python
+    spec:
+      containers:
+      - name: python-container
+        image: krajewskim/python-api:redis
+        ports:
+          - containerPort: 5002
+        env:
+          - name: LOG_LEVEL
+            value: "DEBUG"
+          - name: REDIS_HOST
+            value: "redis-service"
+          - name: REDIS_PORT
+            value: "6379"
+        readinessProbe:
+          httpGet:
+            path: /healthz
+            port: 5002
+          initialDelaySeconds: 1
+          periodSeconds: 1
+        livenessProbe:
+          httpGet:
+            path: /api/v1/info
+            port: 5002
+          initialDelaySeconds: 30 # wait 30 seconds before request
+          periodSeconds: 10 # ask each 10 seconds

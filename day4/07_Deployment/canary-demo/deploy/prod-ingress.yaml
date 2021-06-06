@@ -1,0 +1,21 @@
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  labels:
+    app: app
+    version: 1.0.0
+  name: demo-ingress
+  namespace: demo-prod
+spec:
+  rules:
+  - host: canary-demo.127.0.0.1.nip.io
+    http:
+      paths:
+      - backend:
+          service:
+            name: demo-prod
+            port: 
+              number: 80
+        path: /
+        pathType: Prefix

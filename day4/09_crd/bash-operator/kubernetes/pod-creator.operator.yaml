@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pod-creator-example-deployment
+  labels:
+    app: pod-creator
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: pod-creator
+  template:
+    metadata:
+      labels:
+        app: pod-creator
+    spec:
+      serviceAccountName: pod-creator-operator-account
+      containers:
+      - name: pod-creator
+        image: krajewskim/kubernetes:pod-creator.operator
+        imagePullPolicy: Always

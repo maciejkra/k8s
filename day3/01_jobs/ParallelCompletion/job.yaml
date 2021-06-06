@@ -1,0 +1,22 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: parallel-completion
+  labels:
+    project: workshop
+spec:
+  backoffLimit: 0
+  parallelism: 5
+  completions: 10
+  template:
+    metadata:
+      labels:
+        project: workshop
+    spec:
+      containers:
+        - name: echo
+          image: busybox
+          command: ["/bin/echo", "test"]
+      restartPolicy: Never
+
+

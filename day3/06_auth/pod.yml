@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: my-pod-reader
+  labels:
+    app: my-pod-reader
+spec:
+  serviceAccountName: pods-reader
+  containers:
+    - name: echo
+      image: nginx

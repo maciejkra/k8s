@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: canary-deployment
+  labels:
+    app: cnary-myapp
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cnary-myapp
+  template:
+    metadata:
+      name: cnary-myapp-pod
+      labels:
+        app: cnary-myapp
+    spec:
+      volumes:
+      - name: nginx
+        persistentVolumeClaim:
+          claimName: local02
+      containers:
+      - name: myapp-container
+        image: nginx
+        ports:
+          - containerPort: 80
+        volumeMounts:
+          - name: nginx
+            mountPath: /usr/local/nginx/html

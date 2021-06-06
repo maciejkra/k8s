@@ -1,0 +1,24 @@
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    nginx.ingress.kubernetes.io/canary: "true"
+    nginx.ingress.kubernetes.io/canary-weight: "20"
+  labels:
+    app: demo
+  name: demo-ingress
+  namespace: demo-canary
+spec:
+  rules:
+  - host: canary-demo.127.0.0.1.nip.io
+    http:
+      paths:
+      - backend:
+          service:
+            name: demo-canary
+            port: 
+              number: 80
+        path: /
+        pathType: Prefix
+--- 

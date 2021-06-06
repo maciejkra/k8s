@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-reader
+  labels:
+    app: pod-reader
+spec:
+  serviceAccountName: pods-reader
+  containers:
+    - name: echo
+      image: krajewskim/kubernetes:pod-creator.operator
+      command: ["kubectl","get","pods","-o","wide"]

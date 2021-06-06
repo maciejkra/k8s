@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pv0000
+  labels:
+    app: pv0000
+spec:
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  nfs:
+    path: /var/nfs/general/00
+    server: 127.0.0.1
+  persistentVolumeReclaimPolicy: Recycle
+

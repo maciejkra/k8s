@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pk
+spec:
+  selector:
+    matchLabels:
+      app: pk
+  template:
+    metadata:
+      labels:
+        app: pk
+    spec:
+      containers:
+      - name: demo
+        image: nginx
+        resources: {}
+        ports:
+        - containerPort: 80
+          name: http
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: pk
+spec:
+  selector:
+    app: pk
+  type: ClusterIP
+  ports:
+  - name: http
+    port: 80
+    targetPort: http
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: pk
+spec:
+  tls:
+  - hosts:
+    - localhost
+    secretName: tls-localhost
+  rules:
+    - host: localhost
+      http:
+        paths:
+        - path: /
+          pathType: Prefix
+          backend:
+            service:
+              name: pk
+              port:
+                number: 80

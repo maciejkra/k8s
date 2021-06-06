@@ -1,0 +1,39 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: demo
+    version: 1.0.1
+  name: demo-canary
+  namespace: demo-canary
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: demo
+      version: 1.0.1
+  template:
+    metadata:
+      labels:
+        app: demo
+        version: 1.0.1
+    spec:
+      containers:
+        - name: canary-demo
+          image: krajewskim/canary-demo:1.0.0
+          imagePullPolicy: IfNotPresent
+          ports:
+          - containerPort: 8080
+            protocol: TCP
+          resources:
+            limits:
+              cpu: 50m
+              memory: 128Mi
+            requests:
+              cpu: 10m
+              memory: 32Mi
+          env:
+          - name: VERSION
+            value: "1.0.1 - canary"
+      restartPolicy: Always

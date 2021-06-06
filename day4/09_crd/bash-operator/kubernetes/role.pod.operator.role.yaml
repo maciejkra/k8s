@@ -1,0 +1,12 @@
+kind: Role
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  namespace: default
+  name: pod.operator.role
+rules:
+- apiGroups: [""] # "" indicates the core API group
+  resources: ["pods","services"]
+  verbs: ["get", "watch", "list", "create"]
+- apiGroups: ["bash-operators.maque"] # "" indicates the core API group
+  resources: ["podcreators"]
+  verbs: ["get", "watch", "list"]

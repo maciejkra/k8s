@@ -1,0 +1,20 @@
+filebeat.inputs:
+- type: docker
+  containers.ids:
+  - '*'
+
+processors:
+- add_docker_metadata:
+    host: "unix:///var/run/docker.sock"
+
+- decode_json_fields:
+    fields: ["message"]
+    target: "json"
+    overwrite_keys: true
+
+output.elasticsearch:
+  hosts: ['elasticsearch:9200']
+  protocol: https
+  ssl.verification_mode: none
+  username: "admin" 
+  password: "admin" 

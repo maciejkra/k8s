@@ -1,0 +1,13 @@
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: read.pod.operator.binder
+  namespace: default
+subjects:
+- kind: ServiceAccount
+  name: pod-creator-operator-account
+  namespace: default
+roleRef:
+  kind: Role #this must be Role or ClusterRole
+  name: pod.operator.role # this must match the name of the Role or ClusterRole you wish to bind to
+  apiGroup: rbac.authorization.k8s.io

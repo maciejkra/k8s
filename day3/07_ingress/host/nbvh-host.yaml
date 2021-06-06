@@ -1,0 +1,30 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: helloapp-nbvh-host-svc
+spec:
+  selector:
+    app: helloapp-nbvh-host-dep
+  ports:
+  - port: 80
+    targetPort: 80
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: helloapp-nbvh-host-dep
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: helloapp-nbvh-host-dep
+  template:
+    metadata:
+      labels:
+        app: helloapp-nbvh-host-dep
+    spec:
+      containers:
+      - name: helloapp-nbvh-host-dep
+        image: httpd
+        ports:
+        - containerPort: 80

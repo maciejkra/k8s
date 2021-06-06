@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-readiness
+  labels:
+    app: readiness
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: readiness
+  template:
+    metadata:
+      name: readiness-pod
+      labels:
+        app: readiness
+    spec:
+      containers:
+      - name: myapp-container
+        image: ewoutp/docker-nginx-curl
+        ports:
+          - containerPort: 80
