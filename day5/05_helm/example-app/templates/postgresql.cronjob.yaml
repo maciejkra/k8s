@@ -1,0 +1,57 @@
+{{- range $databaseName, $database :=  $.Values.postgresqlWriter.databases }}
+{{ if $database.enabled }}
+---
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: writer-{{ $databaseName | lower }}
+  namespace: {{  $.Values.namespace }}
+  labels:
+    project: workshops
+    databaseName: {{ $databaseName }}
+spec:
+  schedule: "{{ $database.schedule }}"
+  jobTemplate:
+    metadata:
+      labels:
+        project: workshops
+        databaseName: {{ $databaseName }}
+    spec:
+      template:
+        metadata:
+          labels:
+            project: workshops
+            databaseName: {{ $databaseName }}
+        spec:       
+          restartPolicy: {{ default "Never" $database.restartPolicy }}
+          containers:
+            - name: writer-{{ $databaseName | lower }}
+              imagePullPolicy: "IfNotPresent"
+              image: "{{  $.Values.imageRegistry }}/{{  $.Values.postgresqlWriter.image }}:{{  $.Values.postgresqlWriter.tag }}"
+              resources:
+                requests:
+                  cpu: "100m"
+                limits:
+                  cpu: "500m"
+              env:                     
+                - name: TIMESCALEDB_DATABASE_NAME
+                  valueFrom:
+                    secretKeyRef:
+                      name: timescaledb
+                      key: timescaleDBdbname
+                - name: POSTGRES_HOST
+                  value: postgresql.{{ default $.Values.namespace $.Values.postgresql.namespace }}                
+                - name: POSTGRES_PORT
+                  value: "5432"
+                - name: POSTGRES_PASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      name: postgresql
+                      key: password
+                - name: POSTGRES_PASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      name: postgresql
+                      key: username
+{{- end -}}
+{{- end -}}

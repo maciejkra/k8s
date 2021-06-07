@@ -1,0 +1,22 @@
+imageRegistry: 127.0.0.1:5000
+
+namespace: mynamespace
+
+postgresqlWriter:
+  image: postgresql-writer
+  tag: release-1
+  databases:
+    customer-a:
+      enabled: true
+      schedule: "* 20 * * *"
+      restartPolicy: "OnFailure"
+    customer-b:
+      enabled: false
+      schedule: "* 20 * * *"
+
+
+postgresql:
+  username: 'postgres'
+  password: 'password'
+  
+

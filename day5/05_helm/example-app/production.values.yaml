@@ -1,0 +1,8 @@
+postgresqlWriter:
+  databases:
+    customer-b:
+      enabled: true
+
+
+postgresql:
+  namespace: "other-namespace"
