@@ -2,10 +2,10 @@
 
 - Use base image `python:3-slim`
 - Set working dir (`Workdir`) to `/usr/src/app`
-- execute command in image `pip install --no-cache-dir -r requirements.txt`
 - allow port access on `5002`
 - copy main.py & requirements.txt files
 - copy api folder
+- execute command in image `pip install --no-cache-dir -r requirements.txt`
 - add env variable called `LOG_LEVEL` with value `INFO`
 - run command `python` and `main.py`
 
