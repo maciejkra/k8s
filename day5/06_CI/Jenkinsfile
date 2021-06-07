@@ -1,0 +1,62 @@
+pipeline {  
+    environment {
+        registry = "krajewskim/python"
+        registryCredential = 'dockerhub'
+        dockerImage = ''
+        KUBECTL_NAMESPACE="jenkins-deploy"
+        CI_APP_NAME="python-deployment"
+    } 
+    agent any
+    stages {
+    stage('Building image') {
+      steps{
+        script {
+            dir('day1/03_build_python_image/') {
+                dockerImage = docker.build registry, '-f Dockerfile.solution .'
+            }
+        }
+      }
+    }
+    stage('Deploy Image') {
+      steps{    script {
+          docker.withRegistry( '', registryCredential ) {
+            dockerImage.push()
+          }
+        }
+      }
+    }
+    stage('Remove Unused docker image') {
+      steps{
+        sh "docker rmi $registry"
+      }
+    }
+    stage('List pods') {
+            agent {
+                docker {
+                    image 'krajewskim/kubectl'
+                    args '-v /tmp:/tmp --entrypoint='
+                }
+            }
+            steps{
+                withKubeConfig(credentialsId: 'docker-for-desktop', namespace: 'default') {
+
+                        sh 'kubectl create namespace $KUBECTL_NAMESPACE -o yaml --dry-run | kubectl apply -f -'
+                        sh 'kubectl config set-context $(kubectl config current-context) --namespace=$KUBECTL_NAMESPACE'
+
+
+                        sh '''
+                            kubeval --strict day3/00_task/solution/*
+                            kubectl apply -f day3/00_task/solution
+                            if ! kubectl rollout status deployment $CI_APP_NAME; then
+                                kubectl rollout undo deployment $CI_APP_NAME;
+                                kubectl rollout status deployment $CI_APP_NAME;
+                                exit 1;
+                            fi
+                            echo 'Rollout completed'
+                        '''
+                    }
+        
+            }
+        }
+  }
+}
