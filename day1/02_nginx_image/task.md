@@ -34,7 +34,7 @@ password
 docker image build -t my-nginx:1 -f nginx/Dockerfile nginx/
 ```
 2. Run container one more time
-3. Verify that password file is no longe there
+3. Verify that password file is no longer there
 
 # Forward port
 
