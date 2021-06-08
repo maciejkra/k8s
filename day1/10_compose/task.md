@@ -19,13 +19,12 @@ verify running service
 # Create compose file for nginx, python, redis
 
 1. Web (nginx) service
-- create index.htm and mount with `volumes` in yaml to `/usr/share/nginx/html/`
+- create index.html and mount with `volumes` in yaml to `/usr/share/nginx/html/`
 - use image `nginx:1.15.5`
 
 2. Python service
 - add service with `my-python` image and expose on port `5002`
 - add `depends_on:` to python to depend on redis
-- scale service `docker-compose up -d --scale web=3`
 - `docker-compose down` stops & removes all stuff (see help)
 - run single service `docker-compose up -d python`, should start redis
 - `docker-compose exec python curl web` should access created index.html
@@ -45,7 +44,7 @@ docker-compose exec web /bin/bash
 # Load balancing
 
 - remove port forward
-- scale web
+- scale web `docker-compose up -d --scale web=3`
 - execute curl from python to web `docker-compose exec pyredis curl web`
 - see logs for web from docker-compose
 - see logs directly from docker
