@@ -2,7 +2,7 @@
 
 ```sh
 kubectl get nodes -o wide
-kubect describe node <name>
+kubectl describe node <name>
 ```
 
 Verify on which node pod is running
