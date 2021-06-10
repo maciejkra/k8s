@@ -8,6 +8,6 @@ subjects:
   name: pods-svc-reader
   namespace: default
 roleRef:
-  kind: ClusterRole
+  kind: Role
   name: pods-svc-reader
   apiGroup: rbac.authorization.k8s.io
