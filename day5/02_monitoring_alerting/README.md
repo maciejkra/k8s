@@ -18,7 +18,7 @@ helm repo update
 
 Deploy the Loki stack:
 ```
-helm upgrade --install loki grafana/loki-stack --namespace=loki --set grafana.enabled=true
+helm upgrade --install loki grafana/loki-stack  --set grafana.enabled=true,prometheus.enabled=true,prometheus.alertmanager.persistentVolume.enabled=false,prometheus.server.persistentVolume.enabled=false
 ```
 This will install Loki, Grafana and Promtail into your Kubernetes cluster.
 

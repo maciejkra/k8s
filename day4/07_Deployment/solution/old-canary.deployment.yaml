@@ -21,7 +21,7 @@ spec:
           claimName: local01
       containers:
       - name: myapp-container
-        image: ewoutp/docker-nginx-curl
+        image: nginx
         ports:
           - containerPort: 80
         volumeMounts:

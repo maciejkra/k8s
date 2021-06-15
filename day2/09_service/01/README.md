@@ -15,8 +15,8 @@ Go to <IP of worker node>:<exposed port>
 
 ```sh
 kubectl create -f service.yaml
-kubectl exec -ti myapp-pod curl my-app-service
-kubectl exec -ti myapp-pod curl my-app-service.default.svc.cluster.local
+kubectl exec -ti myapp-pod -- curl my-app-service
+kubectl exec -ti myapp-pod -- curl my-app-service.default.svc.cluster.local
 
-kubectl exec -ti myapp-pod cat /etc/resolv.conf
+kubectl exec -ti myapp-pod -- cat /etc/resolv.conf
 ```

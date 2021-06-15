@@ -5,8 +5,8 @@ kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v2.0.0/a
 create admin-user/rbac
 
 ```sh
-kubectl create -f admin-user.yml
-kubectl create -f rbac-admin.yml
+kubectl create -f admin-user.yaml
+kubectl create -f rbac-admin.yaml
 ```
 
 find admin user:

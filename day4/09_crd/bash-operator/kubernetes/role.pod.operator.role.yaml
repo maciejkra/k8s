@@ -7,6 +7,6 @@ rules:
 - apiGroups: [""] # "" indicates the core API group
   resources: ["pods","services"]
   verbs: ["get", "watch", "list", "create"]
-- apiGroups: ["bash-operators.maque"] # "" indicates the core API group
+- apiGroups: ["bash-operators.maciej"] # "" indicates the core API group
   resources: ["podcreators"]
   verbs: ["get", "watch", "list"]
