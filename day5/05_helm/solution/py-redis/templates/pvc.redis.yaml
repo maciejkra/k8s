@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ .Values.redis.name }}-pvc
+  labels:
+    {{- include "py-redis.labels" . | nindent 4 }}
+    app: {{ .Values.redis.name }}
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ .Values.redis.disk }}
+  storageClassName: {{ .Values.storageClassName }}

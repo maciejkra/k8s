@@ -1,3 +1,11 @@
+```
+kubectl create -f google-service.yaml
+kubectl exec -ti myapp-pod -- curl google-service
+```
+
+kubectl get svc
+kubectl get endpoints
+
 
 # Default ENV exposed example
 

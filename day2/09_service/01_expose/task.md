@@ -1,0 +1,1 @@
+Write a service.yaml for python service type NodePort

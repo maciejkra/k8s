@@ -3,12 +3,14 @@ services:
   web:
     volumes:
       - ./:/usr/share/nginx/html/
-    image: nginx:1.15.5
-  python-redis:
-    image: krajewskim/python-api:redis
+    image: nginx
+  python:
+    image: krajewskim/python-api:new
     ports:
       - 5002:5002
     depends_on: 
       - redis
+    environment:
+      - REDIS_HOST=redis
   redis:
-    image: "redis"
+    image: redis

@@ -4,12 +4,11 @@
 kubectl expose pod myapp-pod --type=NodePort --port=80
 ```
 
-this works also on rc/deployment/ etc.
 
 ```sh
 kubectl get service
 ```
-Go to <IP of worker node>:<exposed port>
+Go to `<IP of worker node>:<exposed port>`
 
 # Expose using declarative approach
 

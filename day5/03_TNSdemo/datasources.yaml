@@ -4,7 +4,7 @@ datasources:
     type: prometheus
     url: http://prometheus:9090/
     access: proxy
-    editable: false
+    editable: true
     isDefault: true
     jsonData:
         httpMethod: GET
@@ -22,7 +22,7 @@ datasources:
     basicAuth: false
     isDefault: false
     version: 1
-    editable: false
+    editable: true
     apiVersion: 1
     jsonData:
       derivedFields:
@@ -33,13 +33,13 @@ datasources:
   - name: Tempo
     type: tempo
     uid: tempo
-    url: http://tempo-query:16686/
+    url: http://tempo/
     access: proxy
-    editable: false
+    editable: true
     isDefault: false
     jsonData:
       httpMethod: GET
       tracesToLogs:
         datasourceUid: 'loki'
-        tags: ['job', 'instance']
+        tags: ['job', 'instance', 'pod', 'namespace']
     version: 1

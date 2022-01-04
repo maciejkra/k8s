@@ -14,7 +14,6 @@ The navigate to http://localhost:3000 to see Grafana.
 
 If you have any problems, run `docker-compose up -d` first.
 
-Optionally, [enable docker metrics](https://docs.docker.com/config/daemon/prometheus/) by adding this to your docker config:
 
 ## Fancy querry
 ```

@@ -1,13 +1,12 @@
 # Create new Dockerfile on your own 
 
-- Use base image `python:3-slim`
-- Set working dir (`Workdir`) to `/usr/src/app`
+- Use base image `python:3-alpine`
+- Set working dir (`WORDKIR`) to `/usr/src/app`
 - allow port access on `5002`
 - copy main.py & requirements.txt files
-- copy api folder
 - execute command in image `pip install --no-cache-dir -r requirements.txt`
 - add env variable called `LOG_LEVEL` with value `INFO`
-- run command `python` and `main.py`
+- run command `uvicorn main:app --host 0.0.0.0 --port 5002`
 
 # Run container form builded image
 1. Check container port
@@ -25,13 +24,13 @@
 3. Check python can connect
 
 ```sh
-localhost:32771/healthz
-curl localhost:32771/api/v1/info
-curl -XPOST localhost:32771/api/v1/info
-curl localhost:32771/api/v1/info
+localhost:<port>/healthz
+curl localhost:<port>/api/v1/info
+curl -XPOST localhost:<port>/api/v1/info
+curl localhost:<port>/api/v1/info
 ```
 
 3. Update env LOG_LEVEL to DEBUG in run command
 
 
-check difference ing logs
+check difference in logs

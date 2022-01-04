@@ -12,11 +12,11 @@ x-logging: &default-logging
         source_labels: ["container_name"]
         target_label: instance
 
-version: '3.3'
+version: '3.4'
 services:
 
   db:
-    image: grafana/tns-db:9c1ab38
+    image: grafana/tns-db:842bd3b
     command:
       - '-log.level=debug'
     ports:
@@ -31,7 +31,7 @@ services:
     logging: *default-logging
 
   app:
-    image: grafana/tns-app:9c1ab38
+    image: grafana/tns-app:842bd3b
     command:
       - '-log.level=debug'
       - 'http://db'
@@ -49,7 +49,7 @@ services:
     logging: *default-logging
 
   loadgen:
-    image: grafana/tns-loadgen:9c1ab38
+    image: grafana/tns-loadgen:842bd3b
     command:
       - '-log.level=debug'
       - 'http://app'
@@ -67,7 +67,7 @@ services:
     logging: *default-logging
 
   grafana:
-    image: grafana/grafana:7.4.x-exemplars
+    image: grafana/grafana:8.2.2
     volumes:
       - ./datasources.yaml:/etc/grafana/provisioning/datasources/datasources.yaml
       - ./dashboards.yaml:/etc/grafana/provisioning/dashboards/dashboards.yaml
@@ -83,7 +83,7 @@ services:
     logging: *default-logging
 
   prometheus:
-    image: tomwilkie/prometheus:0ea72b6a6
+    image: prom/prometheus:v2.30.3
     user: root
     command:
       - --config.file=/etc/prometheus/prometheus.yml
@@ -100,20 +100,6 @@ services:
       - loadgen
     ports:
       - 0.0.0.0:9090:9090
-    labels:
-      namespace: monitoring
-    logging: *default-logging
-
-  cadvisor:
-    image: gcr.io/cadvisor/cadvisor:v0.38.7
-    container_name: cadvisor
-    ports:
-      - 8080:8080
-    volumes:
-      - /:/rootfs:ro
-      - /var/run:/var/run:rw
-      - /sys:/sys:ro
-      - /var/lib/docker/:/var/lib/docker:ro
     labels:
       namespace: monitoring
     logging: *default-logging
@@ -135,7 +121,7 @@ services:
     logging: *default-logging
 
   loki:
-    image: grafana/loki:2.1.0
+    image: grafana/loki:2.3.0
     command:
       - -config.file=/etc/loki/local-config.yaml
       - -table-manager.retention-period=1d
@@ -147,7 +133,7 @@ services:
     logging: *default-logging
 
   tempo:
-    image: grafana/tempo:0.5.0
+    image: grafana/tempo:1.1.0
     command:
       - --target=all
       - --storage.trace.backend=local
@@ -156,16 +142,6 @@ services:
       - --compactor.compaction.block-retention=24h
     ports:
       - "8004:80"
-    labels:
-      namespace: monitoring
-    logging: *default-logging
-
-  tempo-query:
-    image: grafana/tempo-query:0.5.0
-    environment:
-      - BACKEND=tempo
-    ports:
-      - "8006:16686"
     labels:
       namespace: monitoring
     logging: *default-logging

@@ -2,10 +2,9 @@
 
 ```sh
 kubectl create -f deployment.yaml
-kubectl get rs
-kubectl get pods
+kubectl get all
 kubectl scale deployment/nginx-deployment --replicas=0
-kubectl get pods
+kubectl get all
 ```
 
 # Use env variable
@@ -37,12 +36,10 @@ kubectl rollout undo deployment/nginx-deployment
 kubectl annotate deployment/nginx-deployment kubernetes.io/change-cause="env removed"
 kubectl rollout history deployments/nginx-deployment
 
-kubectl exec -ti $(kubectl get pods -l app=myapp -o jsonpath='{.items[0].metadata.name}') /bin/bash
-env|grep TEST_ENV
+kubectl exec -ti $(kubectl get pods -l app=myapp -o jsonpath='{.items[0].metadata.name}') -- env | grep TEST_ENV
 
 kubectl rollout undo deployment/nginx-deployment --to-revision=2
-kubectl exec -ti <container_name> -- /bin/bash
-env|grep TEST_ENV
+kubectl exec -ti $(kubectl get pods -l app=myapp -o jsonpath='{.items[0].metadata.name}') -- env | grep TEST_ENV
 ```
 
 # Scale deployment 

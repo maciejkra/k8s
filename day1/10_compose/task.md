@@ -20,31 +20,28 @@ verify running service
 
 1. Web (nginx) service
 - create index.html and mount with `volumes` in yaml to `/usr/share/nginx/html/`
-- use image `nginx:1.15.5`
+- use image `nginx`
 
-2. Python service
-- add service with `my-python` image and expose on port `5002`
-- add `depends_on:` to python to depend on redis
+
+1. Python service
+- add service with `python` image and expose on port `5002`
+- add `depends_on:` to python to depend on `redis`
+- add `environment:` to python `REDIS_HOST=redis`
+- add `redis` image
 - `docker-compose down` stops & removes all stuff (see help)
 - run single service `docker-compose up -d python`, should start redis
-- `docker-compose exec python curl web` should access created index.html
+- check if endpoint `localhost:<port>/api/v1/info` works
+- `docker-compose up -d` should start all services
+- `docker-compose exec python wget -qO- web` should access created index.html
 - `docker-compose logs`
 - `docker-compose logs -f web`
 
 execute multiple curls to web
 
-# check containers 
-
-enter into service
-
-```sh
-docker-compose exec web /bin/bash
-```
-
 # Load balancing
 
 - remove port forward
 - scale web `docker-compose up -d --scale web=3`
-- execute curl from python to web `docker-compose exec pyredis curl web`
+- execute curl from python to web `docker-compose exec python curl web`
 - see logs for web from docker-compose
 - see logs directly from docker

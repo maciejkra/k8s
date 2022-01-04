@@ -1,8 +1,8 @@
 https://helm.sh/docs/intro/install/
 
 ```sh
-curl https://get.helm.sh/helm-v3.6.0-linux-amd64.tar.gz -o helm-v3.6.0-linux-amd64.tar.gz
-tar -zxvf helm-v3.6.0-linux-amd64.tar.gz
+curl https://get.helm.sh/helm-v3.7.1-linux-amd64.tar.gz -o helm-v3.7.1-linux-amd64.tar.gz
+tar -zxvf helm-v3.7.1-linux-amd64.tar.gz
 sudo mv linux-amd64/helm /usr/local/bin/helm
 ```
 
@@ -34,7 +34,7 @@ kubectl get secrets -n mynamespace
 https://artifacthub.io/
 
 ```sh
-helm search hub wirdpress
+helm search hub wordpress
 helm install happy-panda bitnami/wordpress
 
 helm repo add bitnami https://charts.bitnami.com/bitnami

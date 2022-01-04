@@ -1,4 +1,4 @@
-1. Create pod with python flask application
+1. Create pod with python application
 2. Port forward and check /healthz endpoint
 3. Check logs
 

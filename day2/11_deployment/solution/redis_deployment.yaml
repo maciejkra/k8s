@@ -11,12 +11,10 @@ spec:
       app: redis
   template:
     metadata:
-      name: redis-pod
+      name: redis
       labels:
         app: redis
     spec:
       containers:
-      - name: container
-        image: redis
-        ports:
-        - containerPort: 6379
+      - name: redis
+        image: redis:alpine
