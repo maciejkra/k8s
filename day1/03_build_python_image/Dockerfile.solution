@@ -1,5 +1,5 @@
 FROM python:3-alpine
-WORKDIR WORDKIR
+WORKDIR /usr/src/app
 EXPOSE 5002
 ENV LOG_LEVEL=INFO REDIS_HOST=redis REDIS_PORT=6379
 COPY ./main.py ./
