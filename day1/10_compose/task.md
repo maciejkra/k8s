@@ -42,6 +42,6 @@ execute multiple curls to web
 
 - remove port forward
 - scale web `docker-compose up -d --scale web=3`
-- execute curl from python to web `docker-compose exec python curl web`
+- execute curl from python to web `docker-compose exec python wget -qO- web`
 - see logs for web from docker-compose
 - see logs directly from docker
