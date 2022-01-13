@@ -19,3 +19,8 @@ kubectl -n test-1 describe rs $(kubectl -n test-1 get rs -o jsonpath='{.items[0]
 ## Resource quotas
 
 https://kubernetes.io/docs/concepts/policy/resource-quotas/
+
+https://cloud.google.com/blog/products/containers-kubernetes/kubernetes-best-practices-resource-requests-and-limits
+
+https://kubernetes.io/docs/concepts/scheduling-eviction/kube-scheduler/
+https://kubernetes.io/docs/reference/scheduling/config/#profiles

@@ -1,6 +1,6 @@
 ## Taints
 
-https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
+https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/
 
 taint node
 

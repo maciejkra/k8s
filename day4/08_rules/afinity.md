@@ -1,4 +1,4 @@
-https://kubernetes.io/docs/concepts/configuration/assign-pod-node/
+https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/
 
 
 hard/soft
