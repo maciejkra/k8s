@@ -24,9 +24,9 @@ hostNetwork: true
 
 ```sh
 git clone https://github.com/coreos/kube-prometheus/
-kubectl create -f manifests/setup
+kubectl apply -f manifests/setup
 until kubectl get servicemonitors --all-namespaces ; do date; sleep 1; echo ""; done
-kubectl create -f manifests/
+kubectl apply -f manifests/
 ```
 
 # Minikube

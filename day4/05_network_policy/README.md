@@ -4,7 +4,7 @@ An empty podSelector selects all pods in the namespace
 ## Create policy
 
 ```sh
-kubectl create -f deny.network.policy.yaml
+kubectl apply -f deny.network.policy.yaml
 kubectl exec -ti nginx-stsf-0 -- curl stsf-service.default # wont work
 kubectl delete -f deny.network.policy.yaml
 kubectl exec -ti nginx-stsf-0 -- curl stsf-service.default #  work

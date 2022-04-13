@@ -13,7 +13,7 @@ Go to `<IP of worker node>:<exposed port>`
 # Expose using declarative approach
 
 ```sh
-kubectl create -f service.yaml
+kubectl apply -f service.yaml
 kubectl exec -ti myapp-pod -- curl my-app-service
 kubectl exec -ti myapp-pod -- curl my-app-service.default.svc.cluster.local
 

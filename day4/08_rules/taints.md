@@ -6,7 +6,7 @@ taint node
 
 ```sh
 kubectl taint nodes ubuntu2 key=value:NoSchedule
-kubectl create -f python-deployment.yaml
+kubectl apply -f python-deployment.yaml
 kubectl describe pod -l app=python-taints
 # remove comments
 kubectl apply -f python-deployment.yaml

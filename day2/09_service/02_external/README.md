@@ -1,5 +1,5 @@
 ```
-kubectl create -f google-service.yaml
+kubectl apply -f google-service.yaml
 kubectl exec -ti myapp-pod -- curl google-service
 ```
 

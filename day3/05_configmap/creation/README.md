@@ -19,13 +19,13 @@ kubectl get configmap/test-config -o yaml
 # Create pods
 
 ```sh
-kubectl create -f pod-config.yaml
+kubectl apply -f pod-config.yaml
 kubectl logs configmap-pod
 kubectl logs configmap-pod | grep line
 ```
 
 ```sh
-kubectl create -f pod-config-volume.yaml
+kubectl apply -f pod-config-volume.yaml
 kubectl logs configmap-volume-pod
 ```
 

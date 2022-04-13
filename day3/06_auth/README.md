@@ -3,10 +3,10 @@ ref: https://kubernetes.io/docs/reference/access-authn-authz/authentication/
 
 # Creation
 ```sh
-kubectl create -f sa.pod-reader.yaml
-kubectl create -f cluster-role.yaml
-kubectl create -f rbac.yaml
-kubectl create -f pod.yml
+kubectl apply -f sa.pod-reader.yaml
+kubectl apply -f cluster-role.yaml
+kubectl apply -f rbac.yaml
+kubectl apply -f pod.yml
 ```
 # Get the ServiceAccount token from within the Pod's container
 ```sh
