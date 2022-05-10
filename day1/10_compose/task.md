@@ -3,10 +3,8 @@
 Compose is a tool for defining and running multi-container Docker applications. It takes
 declarative approach to provide working containers with a managed sets.
 
-```sh
-sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-sudo chmod +x /usr/local/bin/docker-compose
-```
+https://docs.docker.com/compose/install/
+
 
 # Compose task
 
@@ -17,10 +15,6 @@ verify running service
 `docker-compose ps`
 
 # Create compose file for nginx, python, redis
-
-1. Web (nginx) service
-- create index.html and mount with `volumes` in yaml to `/usr/share/nginx/html/`
-- use image `nginx`
 
 
 1. Python service
