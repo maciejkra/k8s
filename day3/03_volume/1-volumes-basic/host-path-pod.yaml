@@ -5,10 +5,19 @@ metadata:
   labels:
     name: host-path-pod
 spec:
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+        - matchExpressions:
+          - key: kubernetes.io/hostname
+            operator: In
+            values:
+              - kind-worker
   volumes:
   - name: host-path
     hostPath:
-      path: /tmp
+      path: /files
   containers:
   - name: host-path-pod-bb
     image: busybox
