@@ -13,7 +13,7 @@ spec:
           - key: kubernetes.io/hostname
             operator: In
             values:
-              - kind-worker
+              - workshop-worker
   volumes:
   - name: host-path
     hostPath:
