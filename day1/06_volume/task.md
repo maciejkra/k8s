@@ -13,11 +13,6 @@
 
 File something should be displayed
 
-# Create new Dockerfile
-
-1. Create new Dockerfile
-2. Base image on previous
-3. Change CMD to execute `"ls", "-la","/data"`
 
 # Create volume and add :ro flag
 
