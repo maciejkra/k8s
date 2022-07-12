@@ -14,8 +14,6 @@ kind: Deployment
 metadata:
   name: pk-volume-app
 spec:
-  nodeSelector:
-    kubernetes.io/hostname: workshop-worker
   replicas: 2
   selector:
     matchLabels:
@@ -25,6 +23,8 @@ spec:
       labels:
         app: pk-volume-app
     spec:
+      nodeSelector:
+        kubernetes.io/hostname: workshop-worker
       volumes:
       - name: pvc-volume
         persistentVolumeClaim:
