@@ -21,7 +21,6 @@ verify running service
 - add service with `python` image and expose on port `5002`
 - add `depends_on:` to python to depend on `redis`
 - add `environment:` to python `REDIS_HOST=redis`
-- add `redis` image
 - `docker compose down` stops & removes all stuff (see help)
 - run single service `docker compose up -d python`, should start redis
 - check if endpoint `localhost:<port>/api/v1/info` works
