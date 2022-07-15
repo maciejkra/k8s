@@ -5,6 +5,8 @@ metadata:
   labels:
     app: app
     version: 1.0.0
+  annotations:
+    kubernetes.io/ingress.class: nginx
   name: demo-ingress
   namespace: demo-prod
 spec:
