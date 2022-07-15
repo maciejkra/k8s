@@ -12,7 +12,6 @@ x-logging: &default-logging
         source_labels: ["container_name"]
         target_label: instance
 
-version: '3.4'
 services:
 
   db:
@@ -100,22 +99,6 @@ services:
       - loadgen
     ports:
       - 0.0.0.0:9090:9090
-    labels:
-      namespace: monitoring
-    logging: *default-logging
-
-  node_exporter:
-    image: prom/node-exporter:v1.1.0
-    container_name: node_exporter
-    volumes:
-      - /proc:/host/proc:ro
-      - /sys:/host/sys:ro
-      - /:/rootfs:ro
-    command:
-      - '--path.procfs=/host/proc'
-      - '--path.rootfs=/rootfs'
-      - '--path.sysfs=/host/sys'
-      - '--collector.filesystem.ignored-mount-points=^/(sys|proc|dev|host|etc)($$|/)'
     labels:
       namespace: monitoring
     logging: *default-logging
