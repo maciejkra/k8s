@@ -1,0 +1,33 @@
+##
+## Build
+##
+
+FROM golang:1.16-buster AS build
+
+WORKDIR /app
+
+COPY go.mod .
+COPY go.sum .
+RUN go mod download
+
+COPY *.go ./
+
+RUN CGO_ENABLED=0 go build -installsuffix 'static' -o /docker-gs-ping
+
+# add a user here because addgroup and adduser are not available in scratch
+RUN echo "nobody:x:65534:65534:Nobody:/:" > /etc_passwd
+
+##
+## Deploy
+##
+
+FROM scratch
+
+COPY --from=build /docker-gs-ping /docker-gs-ping
+COPY --from=build /etc/passwd /etc/passwd
+ 
+USER nobody
+
+EXPOSE 8080
+
+ENTRYPOINT ["/docker-gs-ping"]
