@@ -12,7 +12,7 @@ add `env` list
 
 ```sh
 kubectl rollout history deployments/nginx-deployment
-kubectl apply -f deployment.yaml --record
+kubectl apply -f deployment.yaml
 
 kubectl rollout status deployment/nginx-deployment
 kubectl rollout history deployment/nginx-deployment --revision=1
