@@ -23,3 +23,8 @@ ref: https://thenewstack.io/hackers-guide-kubernetes-networking/
 # Compare CNI
 
 https://docs.google.com/spreadsheets/d/1qCOlor16Wp5mHd6MQxB5gUEQILnijyDLIExEpqmee2k/edit#gid=0
+
+
+# Worth to read
+
+https://github.com/ahmetb/kubernetes-network-policy-recipes

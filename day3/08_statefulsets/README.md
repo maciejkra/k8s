@@ -13,4 +13,5 @@ kubectl exec -ti nginx-stsf-0 -- curl nginx-stsf-1.stsf-service.default.svc.clus
 
 # Worth Checking
 https://github.com/zalando/postgres-operator
+
 https://kaluzny.io/przeglad-architektury-w-azure-typu-lld-czesc-pierwsza/

@@ -1,1 +1,1 @@
-Add readyness & liveness probe to python & redis service
+Add readyness & liveness probe to python service

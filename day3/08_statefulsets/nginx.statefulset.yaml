@@ -45,7 +45,6 @@ spec:
     spec:
       accessModes:
       - ReadWriteOnce
-      storageClassName: pk-sc
       resources:
         requests:
           storage: 1Gi

@@ -1,4 +1,3 @@
-Fetching metrics from Heapster is deprecated as of Kubernetes 1.11.
 *metric server required*
 https://github.com/kubernetes-sigs/metrics-server
 

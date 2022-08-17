@@ -36,12 +36,3 @@ curl 127.0.0.1:5002/api/v1/info
  -f "{{.ContainerConfig.Volumes}}"
 ```
 - create redis again attached to volume - check counter
-
-# Clean up
-- remove containers
-
-- list network
-- prune network
-
-- list volumes
-- prune volumes

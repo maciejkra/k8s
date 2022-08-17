@@ -24,7 +24,7 @@ hostNetwork: true
 
 ```sh
 git clone https://github.com/coreos/kube-prometheus/
-kubectl apply -f manifests/setup
+kubectl apply --server-side -f manifests/setup
 until kubectl get servicemonitors --all-namespaces ; do date; sleep 1; echo ""; done
 kubectl apply -f manifests/
 ```
