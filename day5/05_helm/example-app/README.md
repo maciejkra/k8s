@@ -1,5 +1,9 @@
 https://helm.sh/docs/intro/install/
 
+```sh
+ helm template --output-dir=./output .
+ helm template --output-dir=./output --values ./production.values.yaml .
+ ```
 
 ```sh
 kubectl create ns mynamespace
