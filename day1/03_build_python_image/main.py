@@ -3,7 +3,6 @@ import redis
 import socket
 import logging
 import os
-import logging
 import time
 
 LOGGER = logging.getLogger("uvicorn.info")
