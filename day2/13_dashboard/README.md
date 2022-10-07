@@ -12,7 +12,7 @@ kubectl apply -f rbac-admin.yaml
 find admin user:
 ```sh
 kubectl -n kubernetes-dashboard get secret
-kubectl -n kubernetes-dashboard describe secret admin-user-token-<id>
+kubectl -n kubernetes-dashboard describe secret admin-user-secret
 ```
 
 or
