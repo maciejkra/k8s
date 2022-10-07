@@ -94,4 +94,4 @@ roleRef:
 
 ```sh
 kubectl --context=maciej-context get pods --namespace=workshop
-```s
+```
