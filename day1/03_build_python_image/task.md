@@ -1,7 +1,7 @@
 # Create new Dockerfile on your own 
 
 - Use base image `python:3-alpine`
-- Set working dir (`WORDKIR`) to `/usr/src/app`
+- Set working dir (`WORKDIR`) to `/usr/src/app`
 - allow port access on `5002`
 - copy main.py & requirements.txt files
 - execute command in image `pip install --no-cache-dir -r requirements.txt`
