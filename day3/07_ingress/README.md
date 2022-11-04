@@ -1,5 +1,5 @@
 ```sh
-kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.3.1/deploy/static/provider/cloud/deploy.yaml
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.4.0/deploy/static/provider/cloud/deploy.yaml
 ```
 
 for KIND please use
@@ -9,5 +9,7 @@ kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/main
 
 # Worth Reading
 https://kubernetes.io/docs/concepts/services-networking/ingress/
+
 https://kubernetes.github.io/ingress-nginx/
+
 https://cert-manager.io/docs/
