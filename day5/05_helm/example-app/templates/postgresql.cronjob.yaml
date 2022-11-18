@@ -1,7 +1,7 @@
 {{- range $databaseName, $database :=  $.Values.postgresqlWriter.databases }}
 {{ if $database.enabled }}
 ---
-apiVersion: batch/v1beta1
+apiVersion: batch/v1
 kind: CronJob
 metadata:
   name: writer-{{ $databaseName | lower }}
