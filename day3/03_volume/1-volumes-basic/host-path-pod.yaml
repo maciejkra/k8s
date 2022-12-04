@@ -5,8 +5,8 @@ metadata:
   labels:
     name: host-path-pod
 spec:
-  nodeSelector:
-    kubernetes.io/hostname: workshop-worker
+  # nodeSelector:
+  #   kubernetes.io/hostname: workshop-worker
   volumes:
   - name: host-path
     hostPath:

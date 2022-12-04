@@ -6,7 +6,7 @@
 
 - create new network with `docker network create <name>`
 - run both redis image & python image builded from `03_build_python_image` task with `--network <name>`
-- `REDIS_HOST` should be set in python with name of redis container
+- `REDIS_HOST` should be set in python with name of redis container (redis container has to be named)
 - don't expose port on redis
 - python should be exposed on 5002
 

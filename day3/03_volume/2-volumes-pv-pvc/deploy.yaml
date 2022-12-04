@@ -23,8 +23,8 @@ spec:
       labels:
         app: pk-volume-app
     spec:
-      nodeSelector:
-        kubernetes.io/hostname: workshop-worker
+      # nodeSelector:
+      #   kubernetes.io/hostname: workshop-worker
       volumes:
       - name: pvc-volume
         persistentVolumeClaim:
