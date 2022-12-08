@@ -12,4 +12,4 @@ spec:
   initContainers:
   - name: init-myservice
     image: busybox
-    command: ['sh', '-c', 'until nslookup redis-service; do echo waiting for myservice; sleep 2; done;']
+    command: ['sh', '-c', "until nslookup redis-service.$(cat /var/run/secrets/kubernetes.io/serviceaccount/namespace).svc.cluster.local; do echo waiting for redis-service; sleep 2; done"]
