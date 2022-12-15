@@ -5,12 +5,36 @@ import logging
 import os
 import time
 
+LOG_CONFIG = {
+    "version": 1,
+    "disable_existing_loggers": True,
+    "formatters": {"default": {"format": "%(asctime)s [%(process)s] %(levelname)s: %(message)s"}},
+    "handlers": {
+        "console": {
+            "formatter": "default",
+            "class": "logging.StreamHandler",
+            "stream": "ext://sys.stdout",
+            "level": "INFO",
+        }
+    },
+    "root": {"handlers": ["console"], "level": "INFO"},
+    "loggers": {
+        "uvicorn": {"propagate": True},
+        "uvicorn.access": {"propagate": True},
+        "uvicorn.error": {"propagate": True},
+    },
+}
+
+logging.config.dictConfig(LOG_CONFIG)
+
 LOGGER = logging.getLogger("uvicorn.info")
+
 level = os.environ.get("LOG_LEVEL","INFO")
 if level == "INFO":
     LOGGER.setLevel(logging.INFO)
 if level == "DEBUG":
     LOGGER.setLevel(logging.DEBUG)
+
 
 app = FastAPI()
 hostname=socket.gethostname()
@@ -34,6 +58,7 @@ async def healthz():
 
 @app.get("/api/v1/info")
 async def info():
+    started_at = time.time()
     r = get_redis()
     counter =  r.get('counter')
     if counter is None:
@@ -41,17 +66,19 @@ async def info():
     else:
         counter = counter.decode('utf-8')
     LOGGER.info('counter var is %s', counter)
-    started_at = time.time()
     duration = time.time() - started_at
     LOGGER.debug('Request took %s', duration)
     return {"message": "Counter", "hostname": hostname, "value": counter}
 
 @app.post("/api/v1/info")
 def info_post():
+    started_at = time.time()
     r = get_redis()
     previous = r.get('counter')
     if previous is None:
         r.set('counter', 1)
     else:
         r.incr('counter')
+    duration = time.time() - started_at
+    LOGGER.debug('Request took %s', duration)
     return {"message": "OK", "hostname": hostname}

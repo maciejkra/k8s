@@ -2,7 +2,6 @@ apiVersion: apps/v1
 kind: ReplicaSet
 metadata:
   name: replicate-my-app
-  namespace: default
   labels:
     some: other-label
 spec:
