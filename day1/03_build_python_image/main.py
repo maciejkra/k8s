@@ -15,6 +15,12 @@ LOG_CONFIG = {
             "class": "logging.StreamHandler",
             "stream": "ext://sys.stdout",
             "level": "INFO",
+        },
+        "console": {
+            "formatter": "default",
+            "class": "logging.StreamHandler",
+            "stream": "ext://sys.stdout",
+            "level": "DEBUG",
         }
     },
     "root": {"handlers": ["console"], "level": "INFO"},
