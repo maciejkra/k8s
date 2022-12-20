@@ -24,7 +24,7 @@
 3. Check python can connect
 
 ```sh
-localhost:<port>/healthz
+curl localhost:<port>/healthz
 curl localhost:<port>/api/v1/info
 curl -XPOST localhost:<port>/api/v1/info
 curl localhost:<port>/api/v1/info
