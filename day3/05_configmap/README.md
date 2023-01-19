@@ -12,5 +12,5 @@ kubectl apply -f pod-config-volume.yaml
 kubectl logs configmap-volume-pod
 ```
 
-# Wroth Checking
+# Worth Checking
 https://github.com/stakater/Reloader
