@@ -31,9 +31,8 @@ curl -fsSL https://get.docker.com/rootless | sh
 
 ```bash
 # Windows
-$ Set-ExecutionPolicy RemoteSigned
-$ Install-Module posh-docker
-$ Import-Module posh-docker
+$ Install-Module DockerCompletion -Scope CurrentUser
+$ Import-Module DockerCompletion
 
 # Mac
 $ brew tap homebrew/completions

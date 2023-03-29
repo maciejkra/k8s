@@ -13,7 +13,6 @@ x-logging: &default-logging
         target_label: instance
 
 services:
-
   db:
     image: grafana/tns-db:842bd3b
     command:
