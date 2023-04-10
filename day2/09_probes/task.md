@@ -1,1 +1,1 @@
-Add readyness & liveness probe to python service
+Add readyness & liveness probe to python pod
