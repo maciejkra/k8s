@@ -6,16 +6,16 @@ https://helm.sh/docs/intro/install/
  ```
 
 ```sh
-kubectl create ns mynamespace
 helm install . --generate-name
 helm ls
 
-kubectl config set-context --current=true --namespace=mynamespace
-kubectl get all
+kubectl get all 
 
-kubectl config set-context --current=true --namespace=default
-helm uninstall <>
+
+helm uninstall <?>
 helm upgrade --install --atomic my-release .
+
+# for the future use you might consider...
 # helm upgrade --install --atomic my-release . --values production.values.yaml -n NAMESPACE --create-namespace 
 
 

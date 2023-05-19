@@ -1,7 +1,5 @@
 imageRegistry: 127.0.0.1:5000
 
-namespace: mynamespace
-
 postgresqlWriter:
   image: postgresql-writer
   tag: release-1
