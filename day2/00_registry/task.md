@@ -23,6 +23,10 @@ docker image tag <??>
 
 # Push image to new repostiory
 
+```sh
+docker image push <??>
+```
+
 Expected result after completed task
 
 `curl <host_ip>:<forwarded_port>/v2/_catalog`
