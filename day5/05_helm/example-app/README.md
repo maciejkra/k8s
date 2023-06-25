@@ -39,14 +39,14 @@ helm install happy-panda bitnami/wordpress
 Customize values
 ```sh
 helm show values bitnami/wordpress
-echo '{mariadb.auth.database: user0db, mariadb.auth.username: user0}' > values.yaml
-helm install -f values.yaml bitnami/wordpress --generate-name
+echo '{mariadb.auth.database: user0db, mariadb.auth.username: user0}' > values.json
+helm install -f values.jsons bitnami/wordpress --generate-name
 helm get values happy-panda
 ```
 
 Upgrade
 ```sh
-helm upgrade -f panda.yaml happy-panda bitnami/wordpress
+helm upgrade -f values.jsons happy-panda bitnami/wordpress
 helm rollback happy-panda 1
 ```
 
