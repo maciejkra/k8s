@@ -25,6 +25,6 @@ spec:
     spec:
       containers:
       - name: helloapp-fanout-echo-dep
-        image: gcr.io/google_containers/echoserver:1.4
+        image: kicbase/echo-server:1.0
         ports:
         - containerPort: 8080
