@@ -6,6 +6,7 @@ metadata:
     app: pod-reader
 spec:
   serviceAccountName: pods-reader
+  restartPolicy: Never
   containers:
     - name: echo
       image: krajewskim/kubernetes:pod-creator.operator

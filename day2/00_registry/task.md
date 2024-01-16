@@ -54,5 +54,4 @@ docker container start registry
 2. volume mount at: `/var/lib/registry`
 
 For more production case read:
-1. https://docs.docker.com/registry/deploying/
-2. https://docs.docker.com/registry/configuration/#letsencrypt
+1. https://distribution.github.io/distribution/about/deploying/

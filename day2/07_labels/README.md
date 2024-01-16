@@ -1,14 +1,3 @@
-# Labels
-Guidlines: https://kubernetes.io/docs/concepts/overview/working-with-objects/common-labels/
-
-```yml
-tier: frontend
-release: stable
-tenant: tenantA
-```
-
-kubectl
-
 ```sh
 kubectl get pods -A --show-labels
 kubectl get pods -l environment=production,tier=frontend
@@ -35,3 +24,6 @@ selector:
     - {key: tier, operator: In, values: [cache]}
     - {key: environment, operator: NotIn, values: [dev]}
 ```
+
+# Labels
+Guidlines: https://kubernetes.io/docs/concepts/overview/working-with-objects/common-labels/

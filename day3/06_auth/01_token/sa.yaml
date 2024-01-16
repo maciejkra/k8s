@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: maciek
+  namespace: maciek
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: maciek-secret
+  namespace: maciek
+  annotations:
+    kubernetes.io/service-account.name: maciek
+type: kubernetes.io/service-account-token
