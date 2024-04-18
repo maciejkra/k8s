@@ -9,7 +9,7 @@ spec:
         name: configuration
   containers:
     - name: test-container
-      image: k8s.gcr.io/busybox
+      image: busybox
       command: [ "/bin/sh", "-c", "while true;do sleep 5;cat /etc/config/service-b.config;done" ]
       volumeMounts:
         - name: servicejson
