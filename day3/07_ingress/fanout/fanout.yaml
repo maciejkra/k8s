@@ -10,14 +10,14 @@ spec:
   - http:
       paths:
       - path: /host/?(.*)
-        pathType: Prefix
+        pathType: ImplementationSpecific
         backend:
           service:
             name: helloapp-fanout-host-svc
             port:
               number: 80
       - path: /echo/?(.*)
-        pathType: Prefix
+        pathType: ImplementationSpecific
         backend:
           service:
             name: helloapp-fanout-echo-svc

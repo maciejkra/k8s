@@ -5,11 +5,10 @@ metadata:
   labels:
     app: app
     version: 1.0.0
-  annotations:
-    kubernetes.io/ingress.class: nginx
   name: demo-ingress
   namespace: demo-prod
 spec:
+  ingressClassName: nginx
   rules:
   - host: canary-demo.127.0.0.1.nip.io
     http:

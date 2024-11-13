@@ -11,7 +11,7 @@ spec:
     http:
       paths:
       - path: /?(.*)
-        pathType: Prefix
+        pathType: ImplementationSpecific
         backend:
           service:
             name: helloapp-nbvh-nohost-svc
@@ -21,21 +21,21 @@ spec:
     http:
       paths:
       - path: /host/?(.*)
-        pathType: Prefix
+        pathType: ImplementationSpecific
         backend:
           service:
             name: helloapp-nbvh-host-svc
             port: 
               number: 80
       - path: /echo/?(.*)
-        pathType: Prefix
+        pathType: ImplementationSpecific
         backend:
           service:
             name: helloapp-nbvh-echo-svc
             port:
               number: 8080
       - path: /?(.*)
-        pathType: Prefix
+        pathType: ImplementationSpecific
         backend:
           service:
             name:  helloapp-nbvh-dumpster-svc
