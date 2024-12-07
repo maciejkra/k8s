@@ -7,15 +7,12 @@ To run:
 
 ```shell
 $ docker plugin install grafana/loki-docker-driver:latest --alias loki --grant-all-permissions
-$ docker-compose up -d
+$ docker compose up -d
 ```
 
 The navigate to http://localhost:3000 to see Grafana.
 
-If you have any problems, run `docker-compose up -d` first.
-
-
-## Fancy querry
+## Fancy Query
 ```
 {job="tns/app"} | logfmt | status>=500 and status <=599 and duration > 50ms
 ```

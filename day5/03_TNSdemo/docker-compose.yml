@@ -13,6 +13,7 @@ x-logging: &default-logging
         target_label: instance
 
 services:
+
   db:
     image: grafana/tns-db:842bd3b
     command:
@@ -65,7 +66,7 @@ services:
     logging: *default-logging
 
   grafana:
-    image: grafana/grafana:8.2.2
+    image: grafana/grafana:9.5.3
     volumes:
       - ./datasources.yaml:/etc/grafana/provisioning/datasources/datasources.yaml
       - ./dashboards.yaml:/etc/grafana/provisioning/dashboards/dashboards.yaml
@@ -101,6 +102,7 @@ services:
     labels:
       namespace: monitoring
     logging: *default-logging
+
 
   loki:
     image: grafana/loki:2.3.0
