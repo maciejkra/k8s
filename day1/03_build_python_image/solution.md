@@ -8,6 +8,7 @@ curl localhost:<port>/healthz
 
 # Redis
 docker container run -d redis
+docker container inspect <redis container name> #to get the IP address of the container
 docker container rm -f my-python-service
 docker container run -e REDIS_HOST=192.160.0.2 -d -P -e LOG_LEVEL=DEBUG --name  my-python-service my-python
 
