@@ -1,7 +1,7 @@
 # Run registry container
 
 1. image name: `registry`
-2. image version: `2`
+2. image version: `3`
 3. forward port to `5000` port in registry
 
 # Curl should work
