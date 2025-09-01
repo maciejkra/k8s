@@ -15,14 +15,14 @@ Learn how to use Docker volumes:
 1. Build the image from the provided `01_volume_ls` directory:
 
    ```bash
-   docker build -t my-nginx 01_volume_ls
+   docker build -t 01_volume_ls 01_volume_ls
    ```
 
 2. Run the container with the current directory mounted into `/data`:
 
 
      ```
-     docker run --rm -it -v "${PWD}:/data" my-nginx
+     docker run --rm -it -v "${PWD}:/data" 01_volume_ls
      ```
 
 3. Create a file inside the mounted directory:
@@ -40,6 +40,10 @@ Learn how to use Docker volumes:
      ```
 
 4. Check from inside the container that the file is visible in `/data`.
+
+     ```
+     docker run --rm -it -v "${PWD}:/data" 01_volume_ls /data
+     ```
 
 ---
 
