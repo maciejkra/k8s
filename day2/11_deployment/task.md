@@ -17,8 +17,19 @@ kubectl apply -f .
 # check everything works 
 
 ```sh
-curl 127.0.0.1:32000/api/v1/info
-curl -XPOST 127.0.0.1:32000/api/v1/info
-curl 127.0.0.1:32000/api/v1/info
+curl <ip>:<port>/api/v1/info
+curl -XPOST <ip>:<port>/api/v1/info
+curl <ip>:<port>/api/v1/info
 ```
-NOTE: your IP address and port my vary - please check it.
+NOTE: your IP address and port may vary - please check it.
+
+
+EXTRA:
+* Python
+  * Redyness - should check TCP port
+  * Liveness - should check endpoint `/healthz` via HTTP
+* Redis
+  * Redyness - should check TCP port
+  * Liveness - should check command `redis-cli ping`
+
+* Limit Deployment history to 0
