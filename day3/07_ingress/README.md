@@ -5,6 +5,13 @@ kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/cont
 for KIND please use
 ```sh
 kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/main/deploy/static/provider/kind/deploy.yaml
+
+kubectl -n ingress-nginx patch deploy ingress-nginx-controller \
+  --type='json' \
+  -p='[
+    {"op":"add","path":"/spec/template/spec/nodeSelector","value":{"kubernetes.io/hostname":"workshop-control-plane"}}
+  ]'
+
 ```
 
 # Worth Reading
