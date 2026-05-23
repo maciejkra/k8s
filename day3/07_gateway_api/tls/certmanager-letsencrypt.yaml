@@ -1,0 +1,79 @@
+# cert-manager + Let's Encrypt — ścieżka PRODUKCYJNA (NIE zadziała z localhost).
+#
+# HTTP-01 challenge wymaga, żeby Let's Encrypt dosięgnął http://<dnsName>/.well-known/...
+# od strony internetu — czyli potrzebny PUBLICZNY IP i domena nań wskazująca
+# (np. app.<TWOJ-PUBLICZNY-IP>.nip.io). Z 127.0.0.1 to się nie uda — lokalnie
+# używaj tls/certmanager-selfsigned.yaml.
+#
+# Dodatkowo dla Gateway API cert-manager musi mieć włączony gateway-shim
+# (solver tworzy HTTPRoute). Patrz ../README.md → sekcja TLS (jak włączyć bez Helma).
+#
+# Staging (fake CA "Pretend Pear X1") — używaj do iteracji, nie ma rate-limitów.
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: letsencrypt-staging
+spec:
+  acme:
+    server: https://acme-staging-v02.api.letsencrypt.org/directory
+    email: maciejkra@gmail.com
+    privateKeySecretRef:
+      name: letsencrypt-staging-account-key
+    solvers:
+      - http01:
+          gatewayHTTPRoute:
+            parentRefs:
+              - name: training-gateway
+                namespace: default
+                kind: Gateway
+---
+# Prod — DOPIERO gdy staging działa (LE prod: 50 cert/tydzień/domena).
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: letsencrypt-prod
+spec:
+  acme:
+    server: https://acme-v02.api.letsencrypt.org/directory
+    email: maciejkra@gmail.com
+    privateKeySecretRef:
+      name: letsencrypt-prod-account-key
+    solvers:
+      - http01:
+          gatewayHTTPRoute:
+            parentRefs:
+              - name: training-gateway
+                namespace: default
+                kind: Gateway
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: app-tls
+  namespace: default
+spec:
+  secretName: app-tls
+  issuerRef:
+    name: letsencrypt-staging      # zacznij od staging; na prod przełącz po sukcesie
+    kind: ClusterIssuer
+  dnsNames:
+    - app.PODMIEN-NA-TWOJ-PUBLICZNY-IP.nip.io   # musi wskazywać na Twój publiczny IP
+---
+# WAŻNE — sam cert nie wystarczy, żeby coś się wyświetliło po HTTPS.
+# Lokalne HTTPRoute'y (demo/nginx/echo) są na hostname `127-0-0-1`, więc NIE złapią
+# domeny z publicznym IP. Do realnego serwowania appki po TLS potrzebujesz HTTPRoute
+# z TĄ SAMĄ domeną co w certyfikacie wyżej. Odkomentuj i wstaw swój publiczny IP:
+#
+# apiVersion: gateway.networking.k8s.io/v1
+# kind: HTTPRoute
+# metadata:
+#   name: app-public
+# spec:
+#   parentRefs:
+#     - name: training-gateway
+#   hostnames:
+#     - app.PODMIEN-NA-TWOJ-PUBLICZNY-IP.nip.io   # = dnsNames z Certificate
+#   rules:
+#     - backendRefs:
+#         - name: demo-app                         # dowolny backend z backends.yaml
+#           port: 80

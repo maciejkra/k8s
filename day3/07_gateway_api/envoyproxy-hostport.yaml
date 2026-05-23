@@ -1,0 +1,50 @@
+# ====== TYLKO dla klastra kind (workshop). Docker Desktop tego NIE potrzebuje. ======
+#
+# Problem: kind nie ma cloud-providera, więc domyślny Service typu LoadBalancer
+# data-plane'u Envoya wisi w EXTERNAL-IP=<pending> i ruch z hosta go nie dosięga.
+#
+# Rozwiązanie (analogiczne do nodeSelector-patcha, który robiliśmy dla ingress-nginx):
+# przypinamy poda Envoya do node'a control-plane (jedyny z `ingress-ready=true`
+# i z mapowaniem portów 80/443 na host — patrz day2/04_k8s/kind.yaml) i otwieramy
+# na nim hostPort 80/443.
+#
+# WAŻNE — offset portów: Envoy nasłuchuje na porcie listenera +10000 (nie-root nie
+# zbinduje <1024). Listener 80 -> kontener 10080, listener 443 -> kontener 10443.
+# Dlatego hostPort 80 mapujemy na containerPort 10080, a 443 na 10443.
+# Przepływ na kind: host:80 -> node:80 (kind.yaml) -> hostPort -> Envoy:10080.
+apiVersion: gateway.envoyproxy.io/v1alpha1
+kind: EnvoyProxy
+metadata:
+  name: workshop-hostport
+  namespace: envoy-gateway-system
+spec:
+  provider:
+    type: Kubernetes
+    kubernetes:
+      envoyService:
+        type: ClusterIP        # nie LoadBalancer — i tak wisiałby pending na kind
+      envoyDeployment:
+        pod:
+          nodeSelector:
+            ingress-ready: "true"
+          tolerations:
+            - key: node-role.kubernetes.io/control-plane
+              operator: Exists
+              effect: NoSchedule
+        patch:
+          type: StrategicMerge
+          value:
+            spec:
+              template:
+                spec:
+                  containers:
+                    - name: envoy
+                      ports:
+                        - name: http
+                          containerPort: 10080
+                          hostPort: 80
+                          protocol: TCP
+                        - name: https
+                          containerPort: 10443
+                          hostPort: 443
+                          protocol: TCP

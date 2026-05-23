@@ -1,0 +1,32 @@
+# BONUS — URLRewrite. To, co w Ingress wymagało adnotacji
+# `nginx.ingress.kubernetes.io/rewrite-target`, w Gateway API jest typowanym filterem.
+#
+# Przypadek: stare klienty wołają /legacy/..., backend zna tylko /...
+# Filter URLRewrite (ReplacePrefixMatch) przepisuje /legacy -> / ZANIM request
+# trafi do echo-app. echo-server odbija ścieżkę, więc w odpowiedzi widać efekt.
+#
+# Współistnieje z httproute-path.yaml (ten sam host demo.127-0-0-1.nip.io) —
+# Envoy wybiera bardziej specyficzny match (/legacy), reszta leci jak wcześniej.
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: fanout-rewrite
+spec:
+  parentRefs:
+    - name: training-gateway
+  hostnames:
+    - demo.127-0-0-1.nip.io
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /echo2
+      filters:
+        - type: URLRewrite
+          urlRewrite:
+            path:
+              type: ReplacePrefixMatch
+              replacePrefixMatch: /
+      backendRefs:
+        - name: echo-app
+          port: 80

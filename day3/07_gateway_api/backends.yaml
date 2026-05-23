@@ -1,0 +1,66 @@
+# Dwa samodzielne backendy do ćwiczenia (bez zależności od aplikacji z innych dni).
+#  - demo-app : nginx, oddaje stronę powitalną (Service :80 -> pod :80)
+#  - echo-app : kicbase/echo-server, odbija request (metoda, path, nagłówki) —
+#               idealny do zobaczenia, co dociera do backendu (np. po URLRewrite).
+#               Service :80 -> pod :8080 (echo-server nasłuchuje na 8080).
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: demo-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: demo
+  template:
+    metadata:
+      labels:
+        app: demo
+    spec:
+      containers:
+        - name: nginx
+          image: nginx:1.27-alpine
+          ports:
+            - containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: demo-app
+spec:
+  selector:
+    app: demo
+  ports:
+    - port: 80
+      targetPort: 80
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: echo-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: echo
+  template:
+    metadata:
+      labels:
+        app: echo
+    spec:
+      containers:
+        - name: echo
+          image: kicbase/echo-server:1.0
+          ports:
+            - containerPort: 8080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: echo-app
+spec:
+  selector:
+    app: echo
+  ports:
+    - port: 80          # port Service — tego używamy w HTTPRoute.backendRefs.port
+      targetPort: 8080  # port kontenera echo-server

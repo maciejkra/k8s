@@ -1,0 +1,29 @@
+# GatewayClass + Gateway — odpowiednik dawnego IngressClass + Ingress.
+#
+#  GatewayClass  -> KTÓRA implementacja obsłuży ruch (tu: Envoy Gateway).
+#                   install.yaml NIE tworzy GatewayClass automatycznie — tworzymy ją tutaj.
+#  Gateway       -> instancja LB: jakie porty / listenery wystawiamy (tu: HTTP:80).
+#
+# Część 5 (TLS) podmienia ten obiekt na gateway-https.yaml (ten sam metadata.name
+# `training-gateway` — apply nadpisze, dorzucając listener HTTPS:443).
+apiVersion: gateway.networking.k8s.io/v1
+kind: GatewayClass
+metadata:
+  name: eg
+spec:
+  controllerName: gateway.envoyproxy.io/gatewayclass-controller
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: training-gateway
+  namespace: default
+spec:
+  gatewayClassName: eg
+  listeners:
+    - name: http
+      protocol: HTTP
+      port: 80
+      allowedRoutes:
+        namespaces:
+          from: All

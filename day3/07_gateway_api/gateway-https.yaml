@@ -1,0 +1,34 @@
+# Gateway z DWOMA listenerami: HTTP:80 + HTTPS:443. Używamy w Części 5 (TLS).
+#
+# Aplikuj DOPIERO gdy w klastrze istnieje Secret `app-tls` (typu kubernetes.io/tls) —
+# tworzy go albo openssl (tls/README.md, krok ręczny), albo cert-manager
+# (tls/certmanager-selfsigned.yaml). Bez tego Secretu listener `https` zostaje
+# w stanie Invalid (Reason: InvalidCertificateRef) i całość wygląda na zepsutą.
+#
+# Ten sam metadata.name co w gateway-http.yaml — `kubectl apply` nadpisuje obiekt,
+# więc nie trzeba nic kasować, wystarczy zaaplikować ten plik.
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: training-gateway
+  namespace: default
+spec:
+  gatewayClassName: eg
+  listeners:
+    - name: http
+      protocol: HTTP
+      port: 80
+      allowedRoutes:
+        namespaces:
+          from: All
+    - name: https
+      protocol: HTTPS
+      port: 443
+      tls:
+        mode: Terminate                # Envoy terminuje TLS, backend dostaje czysty HTTP
+        certificateRefs:
+          - kind: Secret
+            name: app-tls              # Secret kubernetes.io/tls — patrz tls/
+      allowedRoutes:
+        namespaces:
+          from: All
