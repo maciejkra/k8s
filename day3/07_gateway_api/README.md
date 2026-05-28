@@ -179,6 +179,20 @@ kubectl wait --timeout=180s -n cert-manager \
 > (`kubectl -n cert-manager set args ...` / edycja Deploymentu). Lokalnie i tak
 > nieosiągalne (brak publicznego IP), więc na kursie zostajemy przy 4A/4B.
 
+Dla wariantu 4C (np. na klastrze w chmurze z publicznym IP) dorzuć flagę
+do istniejącego Deploymentu cert-managera:
+
+```sh
+kubectl -n cert-manager patch deploy cert-manager --type=json \
+  -p='[{"op":"add","path":"/spec/template/spec/containers/0/args/-","value":"--enable-gateway-api"}]'
+
+kubectl -n cert-manager rollout status deploy/cert-manager
+```
+
+Bez tej flagi Challenge wisi w stanie `pending` z błędem
+`couldn't Present challenge ...: gateway api is not enabled` —
+cert-manager nie wie, jak utworzyć HTTPRoute dla solvera `http01.gatewayHTTPRoute`.
+
 ---
 
 ## Sprzątanie
