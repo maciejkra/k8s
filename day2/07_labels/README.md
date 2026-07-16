@@ -14,7 +14,7 @@ kubectl get pods -l 'test-label in (my-label)'
 - Deployment
 - ReplicaSet
 - DaemonSet
-- StatefullSet
+- StatefulSet
 
 ```yml
 selector:

@@ -1,6 +1,6 @@
 # Install 
 
-prepare the nodes and lunch `preapre.sh` on each of them - it will prepare the nodes for installation
+prepare the nodes and lunch `prepare.sh` on each of them - it will prepare the nodes for installation
 
 
 **Save the output `kubeadm join` commands**

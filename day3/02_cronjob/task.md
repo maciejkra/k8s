@@ -1,4 +1,4 @@
-Write a CronJob which will increase the python app coutner every minute.
+Write a CronJob which will increase the python app counter every minute.
 
 Use `cmd.cat/curl` image for this task
 

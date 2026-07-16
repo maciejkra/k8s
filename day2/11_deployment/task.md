@@ -26,10 +26,10 @@ NOTE: your IP address and port may vary - please check it.
 
 EXTRA:
 * Python
-  * Redyness - should check TCP port
+  * Readiness - should check TCP port
   * Liveness - should check endpoint `/healthz` via HTTP
 * Redis
-  * Redyness - should check TCP port
+  * Readiness - should check TCP port
   * Liveness - should check command `redis-cli ping`
 
 * Limit Deployment history to 0
