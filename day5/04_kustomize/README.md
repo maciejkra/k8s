@@ -5,5 +5,5 @@
 
 ```sh
 kubectl apply -k bases
-kubectl apply -k prod
+kubectl apply -k overlays/prod
 ```

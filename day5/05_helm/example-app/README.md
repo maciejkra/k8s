@@ -40,13 +40,13 @@ Customize values
 ```sh
 helm show values bitnami/wordpress
 echo '{mariadb.auth.database: user0db, mariadb.auth.username: user0}' > values.json
-helm install -f values.jsons bitnami/wordpress --generate-name
+helm install -f values.json bitnami/wordpress --generate-name
 helm get values happy-panda
 ```
 
 Upgrade
 ```sh
-helm upgrade -f values.jsons happy-panda bitnami/wordpress
+helm upgrade -f values.json happy-panda bitnami/wordpress
 helm rollback happy-panda 1
 ```
 

@@ -18,11 +18,16 @@ spec:
         tier: frontend
     spec:
       containers:
-      - image: wordpress:4.8-apache
+      - image: wordpress:apache
         name: wordpress
         env:
         - name: WORDPRESS_DB_HOST
           value: wordpress-mysql
+        # Stary wordpress:4.8-apache domyślnie łączył się jako root, więc tej zmiennej
+        # nie było. Nowsze obrazy mają domyślnie placeholder 'example username',
+        # co kończy się "Error establishing a database connection".
+        - name: WORDPRESS_DB_USER
+          value: root
         - name: WORDPRESS_DB_PASSWORD
           valueFrom:
             secretKeyRef:
