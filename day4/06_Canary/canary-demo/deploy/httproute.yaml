@@ -1,0 +1,63 @@
+# Weighted routing przez Gateway API (Envoy Gateway z D3/07).
+# Zmieniaj `weight` poniżej, by stopniowo przesuwać ruch z prod → canary.
+#
+# Etapy typowego canary release:
+#   100/0  →  80/20  →  50/50  →  20/80  →  0/100
+#
+# UWAGA: oba Service'y (demo-prod i demo-canary) muszą istnieć, ZANIM zaaplikujesz
+# ten plik — Gateway API rozwiązuje każdy backendRef niezależnie od jego wagi.
+# Dlatego kolejność to: make step-1, make step-2, dopiero potem make deploy-route.
+# Canary startuje z wagą 0: jest wdrożony, ale nie dostaje ruchu — o to chodzi
+# w canary release. Ruch przesuwamy dopiero patchem, bez restartu podów.
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: canary-demo
+  namespace: default            # ten sam namespace co Gateway 'training-gateway' z D3/07
+spec:
+  parentRefs:
+    - name: training-gateway
+  hostnames:
+    - canary-demo.127-0-0-1.nip.io
+  rules:
+    - backendRefs:
+        - name: demo-prod
+          namespace: demo-prod
+          port: 80
+          weight: 100           # ZMIEŃ — stopniowo zmniejszaj: 100 → 80 → 50 → 20 → 0
+        - name: demo-canary
+          namespace: demo-canary
+          port: 80
+          weight: 0             # ZMIEŃ — stopniowo zwiększaj: 0 → 20 → 50 → 80 → 100
+---
+# ReferenceGrant pozwala HTTPRoute z 'default' używać Service-ów z 'demo-prod'.
+# Ingress tego nie wymagał — Gateway API żąda jawnej zgody na cross-namespace.
+apiVersion: gateway.networking.k8s.io/v1beta1
+kind: ReferenceGrant
+metadata:
+  name: from-default-httproute
+  namespace: demo-prod
+spec:
+  from:
+    - group: gateway.networking.k8s.io
+      kind: HTTPRoute
+      namespace: default
+  to:
+    - group: ""
+      kind: Service
+---
+# Analogicznie dla 'demo-canary'
+apiVersion: gateway.networking.k8s.io/v1beta1
+kind: ReferenceGrant
+metadata:
+  name: from-default-httproute
+  namespace: demo-canary
+spec:
+  from:
+    - group: gateway.networking.k8s.io
+      kind: HTTPRoute
+      namespace: default
+  to:
+    - group: ""
+      kind: Service

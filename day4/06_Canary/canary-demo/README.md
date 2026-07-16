@@ -1,61 +1,73 @@
-# Canary Deployments with NGINX Ingress Controller
+# Canary Deployments with Gateway API
 ## Overview
-This repository contains all resources that are required to test the canary feature of NGINX Ingress Controller. 
+Weighted canary release na Gateway API (Envoy Gateway). Podział ruchu to pole `weight`
+w `HTTPRoute` — nie adnotacja kontrolera. Wagi zmieniamy na żywo, bez restartu podów.
 
 ## Requirements
-* Kubernetes cluster 
-* NGINX Ingress Controller 0.21.0+
+* Klaster Kubernetes
+* Envoy Gateway + działający Gateway `training-gateway` — patrz `day3/07_gateway_api`
+* `hey` (`brew install hey`) i `jq`
 
 ## Getting Started
 
 ### Canary Test Scenario
-##### Prepare Manifests  
-First of all, change the host definition in the ingress manifests ***deploy/prod-ingress.yaml*** and ***deploy/canary-ingress.yaml*** from canary-demo.example.com to your URL
-  
-##### Deploy production release  
-Roll-out the stable version 1.0.0 to the cluster
+
+##### Deploy both releases
+Stable 1.0.0 (`demo-prod`) i canary 1.0.1 (`demo-canary`):
 ```bash
 $ make step-1
-```
-  
-##### Run tests  
-Execute the following commands to send n=1000 requests to the endpoint
-```bash
-$ ab -n 1000 -c 100 -s 60 "http://<your_URL>/version"
-$ curl -s "http://<your_URL>/metrics" | jq '.calls'
-```
-If everything is working as expected, the curl command should return "1000".
-  
-##### Reset request counter  
-Send GET requests to /reset endpoint to set the request counter to zero
-```bash
-$ curl "http://<your_URL>/reset"
-```
-  
-##### Canary deployment  
-Push the new software version 1.0.1 as a canary deployment to the cluster
-```bash
 $ make step-2
 ```
-  
-##### Perform tests  
-Again, start sending traffic to the endpoint
+Oba Service'y muszą istnieć, zanim powstanie `HTTPRoute` — Gateway API rozwiązuje każdy
+`backendRef` niezależnie od jego wagi.
+
+##### Route the traffic
 ```bash
-$ ab -n 1000 -c 100 -s 60 "http://<your_URL>/version"
+$ make deploy-route
+$ kubectl get httproute canary-demo -o jsonpath='{.status.parents[0].conditions[?(@.type=="ResolvedRefs")].status}'
 ```
-  
-##### Verify the weight split  
-Do a port forward to each of the pods to check the request count
+Musi zwrócić `True`. `deploy-route` tworzy `HTTPRoute` (100/0 — canary jest wdrożony,
+ale nie dostaje ruchu) plus dwa `ReferenceGrant`. Grant jest potrzebny, bo `HTTPRoute`
+żyje w `default`, a Service'y w `demo-prod`/`demo-canary` — Gateway API wymaga jawnej
+zgody na cross-namespace, czego Ingress nie potrzebował.
+
+##### Run tests
 ```bash
-$ kubectl -n demo-prod port-forward <pod-name> 8080:8080
-$ curl -s http://localhost:8080/metrics | jq '.calls'
-$ kubectl -n demo-prod port-forward <pod-name> 8081:8080
-$ curl -s http://localhost:8081/metrics | jq '.calls'
+$ hey -n 1000 -c 100 "http://canary-demo.127-0-0-1.nip.io/version"
+$ curl -s "http://canary-demo.127-0-0-1.nip.io/metrics" | jq '.calls'
 ```
-Unless the weight has been changed to a different value, you should see approximately 800 requests being served by the production deployment and the remainig 200 by the canary. 
+Przy 100/0 cały ruch idzie do `demo-prod` — 1000 odpowiedzi `[200]`.
+
+> Nie używaj `ab` — wysyła HTTP/1.0, na co Envoy odpowiada `426 Upgrade Required`.
+> Pierwszy przebieg na zimnych podach może dać kilka `504`; powtórz.
+
+##### Shift traffic to canary
+Ten sam obiekt, zmienione wagi — bez `kubectl apply` na deploymentach:
+```bash
+$ kubectl patch httproute canary-demo --type=json \
+    -p='[{"op":"replace","path":"/spec/rules/0/backendRefs/0/weight","value":80},
+         {"op":"replace","path":"/spec/rules/0/backendRefs/1/weight","value":20}]'
+```
+
+##### Verify the weight split
+Zeruj liczniki na obu podach (`/reset` przez gateway trafiłby tylko w jeden) i puść ruch:
+```bash
+$ kubectl -n demo-prod   port-forward deployment/demo-prod   8080:8080 &
+$ kubectl -n demo-canary port-forward deployment/demo-canary 8081:8080 &
+$ curl -s http://localhost:8080/reset && curl -s http://localhost:8081/reset
+
+$ hey -n 1000 -c 100 "http://canary-demo.127-0-0-1.nip.io/version"
+
+$ curl -s http://localhost:8080/metrics | jq '.calls'   # ~800
+$ curl -s http://localhost:8081/metrics | jq '.calls'   # ~200
+```
+Rozkład jest losowy, więc ~800/200, nie dokładnie. Sprawdź `kubectl -n demo-prod get pods`
+— `RESTARTS` dalej `0`: przesunięcie ruchu nie dotknęło podów.
+
+Kolejne etapy: 50/50, 20/80, 0/100 — tym samym patchem.
 
 ### Delete
-Remove all resource from the cluster 
 ```bash
+$ kubectl delete -f ./deploy/httproute.yaml
 $ make clean-up
 ```
