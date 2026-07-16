@@ -2,7 +2,8 @@
 
 Następca **Ingress**. Ingress jest dziś legacy — routing po hoście/ścieżce, a wszystko
 inne (rewrite, TLS, nagłówki) przez adnotacje specyficzne dla kontrolera ("annotation
-hell"). Gateway API (GA od K8s 1.29) robi to deklaratywnie, w typowanych obiektach:
+hell"). Gateway API (GA od v1.0 w 2023, dziś v1.6 — osobny projekt, wersjonowany
+niezależnie od Kubernetesa) robi to deklaratywnie, w typowanych obiektach:
 
 | Obiekt         | Co opisuje                                   | Odpowiednik w Ingress |
 |----------------|----------------------------------------------|-----------------------|
@@ -35,7 +36,7 @@ z gotowego manifestu (analogicznie do `deploy.yaml` ingress-nginx, którego uży
 wcześniej):
 
 ```sh
-kubectl apply --server-side -f https://github.com/envoyproxy/gateway/releases/download/v1.3.2/install.yaml
+kubectl apply --server-side -f https://github.com/envoyproxy/gateway/releases/download/v1.8.2/install.yaml
 
 kubectl wait --timeout=180s -n envoy-gateway-system \
   deployment/envoy-gateway --for=condition=Available
@@ -168,7 +169,7 @@ Patrz **[`tls/README.md`](tls/README.md)**: self-signed (openssl) → cert-manag
 ### cert-manager bez Helma (do Przykładu 4B/4C)
 
 ```sh
-kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.19.2/cert-manager.yaml
+kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.21.0/cert-manager.yaml
 kubectl wait --timeout=180s -n cert-manager \
   deployment/cert-manager deployment/cert-manager-webhook --for=condition=Available
 ```
@@ -202,7 +203,7 @@ kubectl delete -f host/ -f fanout/ -f backends.yaml --ignore-not-found
 kubectl delete httproute welcome --ignore-not-found
 kubectl delete -f gateway-http.yaml --ignore-not-found
 # (opcjonalnie) Envoy Gateway / cert-manager:
-# kubectl delete -f https://github.com/envoyproxy/gateway/releases/download/v1.3.2/install.yaml
+# kubectl delete -f https://github.com/envoyproxy/gateway/releases/download/v1.8.2/install.yaml
 ```
 
 ## Linki

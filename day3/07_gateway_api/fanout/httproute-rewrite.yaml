@@ -20,7 +20,7 @@ spec:
     - matches:
         - path:
             type: PathPrefix
-            value: /echo2
+            value: /legacy
       filters:
         - type: URLRewrite
           urlRewrite:
