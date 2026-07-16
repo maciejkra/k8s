@@ -12,6 +12,9 @@ services:
         tag: "http"
 
   syslog:
-    image: voxxit/rsyslog 
+    image: voxxit/rsyslog
+    # Obraz nie ma manifestu arm64 — bez tego na Apple Silicon pull pada
+    # ("no matching manifest for linux/arm64/v8"). Emulacja amd64 wystarcza.
+    platform: linux/amd64
     ports:
         - "5514:514/udp"
