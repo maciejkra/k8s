@@ -1,6 +1,6 @@
 pipeline {  
     environment {
-        registry = "krajewskim/python"
+        registry = "krajewskim/python:ci"
         registryCredential = 'dockerhub'
         dockerImage = ''
         KUBECTL_NAMESPACE="jenkins-deploy"
@@ -40,13 +40,14 @@ pipeline {
             steps{
                 withKubeConfig(credentialsId: 'docker-for-desktop', namespace: 'default') {
 
-                        sh 'kubectl create namespace $KUBECTL_NAMESPACE -o yaml --dry-run | kubectl apply -f -'
+                        sh 'kubectl create namespace $KUBECTL_NAMESPACE -o yaml --dry-run=client | kubectl apply -f -'
                         sh 'kubectl config set-context $(kubectl config current-context) --namespace=$KUBECTL_NAMESPACE'
 
 
                         sh '''
-                            kubeval --strict day3/00_task/solution/*
-                            kubectl apply -f day3/00_task/solution
+                            kubeconform -strict day2/11_deployment/solution/
+                            kubectl apply -f day2/11_deployment/solution
+                            kubectl set image deployment/$CI_APP_NAME python=$registry
                             if ! kubectl rollout status deployment $CI_APP_NAME; then
                                 kubectl rollout undo deployment $CI_APP_NAME;
                                 kubectl rollout status deployment $CI_APP_NAME;
