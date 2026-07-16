@@ -11,29 +11,20 @@ niezależnie od Kubernetesa) robi to deklaratywnie, w typowanych obiektach:
 | `Gateway`      | instancja LB: porty i listenery (80/443)     | część `Ingress`       |
 | `HTTPRoute`    | reguły routingu (host, path, filtry)         | `rules:` w `Ingress`  |
 
-W tym ćwiczeniu używamy **Envoy Gateway** i dwóch samodzielnych backendów (`nginx` +
-`echo-server` z `backends.yaml`) — bez zależności od aplikacji z innych dni.
-
----
+Backendy: `nginx` + `echo-server` z `backends.yaml` — bez zależności od innych dni.
 
 ## Wymagania
 
-Jeden z dwóch klastrów lokalnych:
-- **kind** — klaster `workshop` z `day2/04_k8s/kind.yaml` (control-plane ma label
-  `ingress-ready=true` i mapowanie portów 80/443 na host), **albo**
-- **Docker Desktop** — z włączonym Kubernetesem (Settings → Kubernetes → Enable).
+Klaster: **kind** (`workshop` z `day2/04_k8s/kind.yaml`) albo **Docker Desktop**
+z włączonym Kubernetesem.
 
-> **Uwaga o portach 80/443:** muszą być wolne na hoście. Jeśli coś już je zajmuje
-> (`sudo lsof -nP -iTCP:80 -sTCP:LISTEN`), zatrzymaj to — inaczej ruch z `localhost`
-> nie dojdzie do klastra.
+> Porty `:80`/`:443` muszą być wolne na hoście — sprawdź `sudo lsof -nP -iTCP:80 -sTCP:LISTEN`.
 
 ---
 
 ## Krok 1 — Instalacja Envoy Gateway (bez Helma)
 
-Helm poznajemy dopiero w `day5/05_helm`. Tu instalujemy zwykłym `kubectl apply`
-z gotowego manifestu (analogicznie do `deploy.yaml` ingress-nginx, którego używaliśmy
-wcześniej):
+Helm poznajemy dopiero w `day5/05_helm`, więc tu zwykły `kubectl apply`:
 
 ```sh
 kubectl apply --server-side -f https://github.com/envoyproxy/gateway/releases/download/v1.8.2/install.yaml
@@ -42,51 +33,33 @@ kubectl wait --timeout=180s -n envoy-gateway-system \
   deployment/envoy-gateway --for=condition=Available
 ```
 
-`install.yaml` zawiera CRD-y Gateway API + samego Envoy Gateway. **Nie** tworzy
-`GatewayClass` — robi to za nas `gateway-http.yaml` w Kroku 3.
+`install.yaml` zawiera CRD-y Gateway API + Envoy Gateway. **Nie** tworzy `GatewayClass`
+— robi to `gateway-http.yaml` w Kroku 3.
 
 ---
 
 ## Krok 2 — Ekspozycja na hoście
 
-Cel: dostać się do Envoya z hosta. Sposób zależy od klastra.
+**Docker Desktop** — nic nie trzeba. Wbudowany LoadBalancer nada Service'owi Envoya
+`EXTERNAL-IP: localhost`. Pomiń resztę tego kroku oraz `kubectl patch gatewayclass`
+w Kroku 3.
 
-### Docker Desktop — nic nie trzeba
-
-Docker Desktop ma wbudowany LoadBalancer: domyślny Service `LoadBalancer` data-plane'u
-Envoya dostaje `EXTERNAL-IP: localhost` i jest wystawiony na `localhost:80` / `:443`.
-Po Kroku 3 `curl http://localhost/` zadziała wprost. Pomiń sekcję kind poniżej oraz
-`kubectl patch gatewayclass` w Kroku 3.
-
-> **Warunek:** porty `:80`/`:443` na hoście muszą być wolne. Jeśli trzyma je inny
-> kontener/aplikacja (np. lokalny Traefik/NGINX), LoadBalancer zostanie `EXTERNAL-IP
-> <pending>` i `curl http://localhost/` trafi w tamtą aplikację. Zwolnij porty
-> (`sudo lsof -nP -iTCP:80 -sTCP:LISTEN`, zatrzymaj proces) i odśwież Gateway.
-
-### kind (`workshop`) — przypnij data-plane do control-plane
-
-kind nie ma cloud-providera, więc `LoadBalancer` zostałby `pending`. Przypinamy poda
-Envoya do node'a z portami 80/443 i otwieramy na nim `hostPort` (to samo, co robiliśmy
-nodeSelector-patchem dla ingress-nginx — tu w obiekcie `EnvoyProxy`). Tu aplikujemy
-sam obiekt `EnvoyProxy`; podpięcie go pod GatewayClass `eg` jest w Kroku 3 (bo `eg`
-powstaje dopiero tam):
+**kind** — nie ma cloud-providera, więc `LoadBalancer` zostałby `pending`. Przypinamy
+poda Envoya do control-plane i otwieramy na nim `hostPort`:
 
 ```sh
 kubectl apply -f envoyproxy-hostport.yaml
 ```
 
-> Detal, który łatwo przeoczyć: Envoy (jako nie-root) nie zbinduje portów <1024,
-> więc nasłuchuje na **porcie listenera +10000** — listener 80 → kontener 10080,
-> 443 → 10443. Dlatego `envoyproxy-hostport.yaml` mapuje `hostPort: 80 → containerPort: 10080`.
+> Envoy jako nie-root nie zbinduje portów <1024, więc nasłuchuje na **porcie listenera
+> +10000**: 80 → 10080, 443 → 10443. Stąd `hostPort: 80 → containerPort: 10080`.
 > Przepływ: `host:80 → node:80 (kind.yaml) → hostPort → Envoy:10080`.
-> Pod Envoya wyląduje na control-plane (jedyny node z `ingress-ready=true`); na
-> Twoim 4-nodowym `workshop` `toleration` w pliku pozwala mu tam usiąść mimo taintu.
+> Pod wyląduje na control-plane (jedyny node z `ingress-ready=true`); `toleration`
+> w pliku pozwala mu tam usiąść mimo taintu.
 
 ---
 
-## Krok 3 — Sanity check (zanim wejdziemy w nip.io)
-
-Stwórz GatewayClass + Gateway + backendy + prosty catch-all route i sprawdź plumbing:
+## Krok 3 — Sanity check
 
 ```sh
 kubectl apply -f gateway-http.yaml -f backends.yaml
@@ -106,26 +79,21 @@ spec:
           port: 80
 EOF
 
-# TYLKO kind: teraz GatewayClass "eg" istnieje — podepnij pod nią EnvoyProxy z Kroku 2.
-# (Docker Desktop: pomiń tę komendę.) Po patchu data-plane się przeładuje.
+# TYLKO kind: GatewayClass "eg" już istnieje, więc podpinamy pod nią EnvoyProxy z Kroku 2.
 kubectl patch gatewayclass eg --type=merge -p '{"spec":{"parametersRef":{"group":"gateway.envoyproxy.io","kind":"EnvoyProxy","name":"workshop-hostport","namespace":"envoy-gateway-system"}}}'
 
 kubectl wait --for=condition=Programmed gateway/training-gateway --timeout=120s
 
 curl -s http://localhost/ | head -3
-# <!DOCTYPE html> / <html> / <title>Welcome to nginx!</title>
+# <title>Welcome to nginx!</title>
 ```
 
-> **Jeśli `Programmed` długo jest `False`:**
-> - kind → najczęściej brak `patch gatewayclass` (data-plane nie wstał na control-plane);
-> - Docker Desktop → `AddressNotAssigned`/`EXTERNAL-IP <pending>` oznacza zajęty `:80`/`:443`
->   na hoście (inny kontener) — zwolnij porty.
+> `Programmed` długo `False`? kind → brak `patch gatewayclass`.
+> Docker Desktop → `EXTERNAL-IP <pending>` oznacza zajęty `:80`/`:443` na hoście.
 
-Widzisz HTML nginxa → ruch z hosta dociera do Envoya, GatewayClass reconciluje,
-HTTPRoute jest podpięty. `welcome` zostaje na czas ćwiczenia; bardziej specyficzne
-route'y poniżej wygrywają z nim dla swoich domen (Gateway API: most-specific-match).
-
-Na obu klastrach adresy w przykładach niżej są wprost: `curl http://<host>/` (port 80).
+Widzisz HTML nginxa → ruch dociera do Envoya, HTTPRoute jest podpięty. `welcome`
+zostaje; bardziej specyficzne route'y poniżej wygrywają z nim dla swoich domen
+(most-specific-match).
 
 ---
 
@@ -135,7 +103,7 @@ Na obu klastrach adresy w przykładach niżej są wprost: `curl http://<host>/` 
 kubectl apply -f fanout/httproute-path.yaml
 
 curl http://demo.127-0-0-1.nip.io/         # -> nginx (demo-app)
-curl http://demo.127-0-0-1.nip.io/echo     # -> echo-server (echo-app), odbija request
+curl http://demo.127-0-0-1.nip.io/echo     # -> echo-server, odbija request
 ```
 
 ## Przykład 2 — Routing po nazwie hosta (nip.io)
@@ -174,14 +142,9 @@ kubectl wait --timeout=180s -n cert-manager \
   deployment/cert-manager deployment/cert-manager-webhook --for=condition=Available
 ```
 
-> Issuer `selfSigned` (4B) działa od razu. Dla Let's Encrypt + Gateway API (4C)
-> cert-manager musi mieć włączony solver Gateway (`gateway-shim`) — w instalacji bez
-> Helma dodaje się to flagą kontrolera `--enable-gateway-api`
-> (`kubectl -n cert-manager set args ...` / edycja Deploymentu). Lokalnie i tak
-> nieosiągalne (brak publicznego IP), więc na kursie zostajemy przy 4A/4B.
-
-Dla wariantu 4C (np. na klastrze w chmurze z publicznym IP) dorzuć flagę
-do istniejącego Deploymentu cert-managera:
+Issuer `selfSigned` (4B) działa od razu. Let's Encrypt (4C) wymaga publicznego IP,
+więc lokalnie zostajemy przy 4A/4B. Na klastrze w chmurze cert-manager potrzebuje
+dodatkowo solvera Gateway (`gateway-shim`):
 
 ```sh
 kubectl -n cert-manager patch deploy cert-manager --type=json \
@@ -190,9 +153,7 @@ kubectl -n cert-manager patch deploy cert-manager --type=json \
 kubectl -n cert-manager rollout status deploy/cert-manager
 ```
 
-Bez tej flagi Challenge wisi w stanie `pending` z błędem
-`couldn't Present challenge ...: gateway api is not enabled` —
-cert-manager nie wie, jak utworzyć HTTPRoute dla solvera `http01.gatewayHTTPRoute`.
+Bez tej flagi Challenge wisi w `pending` z `gateway api is not enabled`.
 
 ---
 
