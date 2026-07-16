@@ -21,7 +21,7 @@ Retrieve the password to log into Grafana:
 ```
 kubectl get secret loki-grafana --namespace=loki -o jsonpath="{.data.admin-password}" | base64 --decode ; echo
 ```
-The generated admin password will look like this one -> `jvjqUy2nhsHplVwrX8V05UgSDYEDz6pSiBZOCPHf`
+The generated admin password will look like this one -> `<40-znakowy losowy ciąg>`
 
 Finally, execute the command below to access the Grafana UI.
 ```
