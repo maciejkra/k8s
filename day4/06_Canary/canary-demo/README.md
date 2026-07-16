@@ -68,6 +68,6 @@ Kolejne etapy: 50/50, 20/80, 0/100 — tym samym patchem.
 
 ### Delete
 ```bash
-$ kubectl delete -f ./deploy/httproute.yaml
 $ make clean-up
 ```
+`clean-up` kasuje cały `./deploy/`, łącznie z `httproute.yaml` i `ReferenceGrant`ami.

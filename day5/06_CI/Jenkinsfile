@@ -48,6 +48,11 @@ pipeline {
                             kubeconform -strict day2/11_deployment/solution/
                             kubectl apply -f day2/11_deployment/solution
                             kubectl set image deployment/$CI_APP_NAME python=$registry
+                            # imagePullPolicy=Always jest konieczne: K8s domyśla Always TYLKO dla
+                            # tagu :latest, a dla :ci daje IfNotPresent. Tag :ci jest mutowalny,
+                            # więc bez tego node użyłby obrazu z cache i wdrożył stary kod,
+                            # a rollout status i tak zgłosiłby sukces.
+                            kubectl patch deployment $CI_APP_NAME -p '{"spec":{"template":{"spec":{"containers":[{"name":"python","imagePullPolicy":"Always"}]}}}}'
                             if ! kubectl rollout status deployment $CI_APP_NAME; then
                                 kubectl rollout undo deployment $CI_APP_NAME;
                                 kubectl rollout status deployment $CI_APP_NAME;

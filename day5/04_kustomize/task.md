@@ -2,7 +2,8 @@
 1. create deplyments & services for python service in bases
 2. create 2 enviornments test and prod
 3. prod:
-   1. set ingress routing to python service under python.127.0.0.1.nip.io
+   1. set HTTPRoute routing to python service under python.127-0-0-1.nip.io
+      (use `training-gateway` from `day3/07_gateway_api`)
    2. change replicas set to 2 for python service
    3. deploy everything in namespace python
 4. test:

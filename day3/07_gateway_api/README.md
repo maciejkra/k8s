@@ -84,7 +84,7 @@ kubectl patch gatewayclass eg --type=merge -p '{"spec":{"parametersRef":{"group"
 
 kubectl wait --for=condition=Programmed gateway/training-gateway --timeout=120s
 
-curl -s http://localhost/ | head -3
+curl -s http://localhost/ | grep -o '<title>.*</title>'
 # <title>Welcome to nginx!</title>
 ```
 
@@ -163,6 +163,9 @@ Bez tej flagi Challenge wisi w `pending` z `gateway api is not enabled`.
 kubectl delete -f host/ -f fanout/ -f backends.yaml --ignore-not-found
 kubectl delete httproute welcome --ignore-not-found
 kubectl delete -f gateway-http.yaml --ignore-not-found
+# po Przykładzie 4 (TLS):
+kubectl delete secret app-tls --ignore-not-found
+kubectl delete -f tls/certmanager-selfsigned.yaml --ignore-not-found
 # (opcjonalnie) Envoy Gateway / cert-manager:
 # kubectl delete -f https://github.com/envoyproxy/gateway/releases/download/v1.8.2/install.yaml
 ```

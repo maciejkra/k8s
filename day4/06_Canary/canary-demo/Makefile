@@ -25,11 +25,11 @@ deploy-canary:
 
 deploy-route:
 	# Weighted routing przez Gateway API (HTTPRoute + ReferenceGrants).
-	# Edytuj weight w httproute.yaml żeby zmienić proporcje (100/0 → 80/20 → 50/50 → 0/100).
+	# Edytuj weight w httproute.yaml żeby zmienić proporcje (100/0 → 80/20 → 50/50 → 20/80 → 0/100).
 	kubectl apply -f ./deploy/httproute.yaml
 
 dry-run:
 	kubectl apply -f ./deploy/. --dry-run=client
 
 clean-up:
-	kubectl delete -f ./deploy/.
+	kubectl delete -f ./deploy/. --ignore-not-found

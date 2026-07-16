@@ -1,4 +1,4 @@
-FROM gradle:jdk21
+FROM gradle:9.6-jdk21
 USER root
 RUN mkdir -p /app
 WORKDIR /app
