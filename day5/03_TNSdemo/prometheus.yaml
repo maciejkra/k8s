@@ -31,7 +31,7 @@ scrape_configs:
     - targets: ['loki:3100']
   - job_name: 'monitoring/tempo'
     static_configs:
-    - targets: ['tempo:80']
+    - targets: ['tempo:3200']
   - job_name: 'tns/app'
     static_configs:
     - targets: ['app:80']
