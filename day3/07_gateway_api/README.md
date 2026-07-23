@@ -21,8 +21,8 @@ z włączonym Kubernetesem.
 > Porty `:80`/`:443` muszą być wolne na hoście — sprawdź `sudo lsof -nP -iTCP:80 -sTCP:LISTEN`.
 
 Do **Przykładu 4C** (Let's Encrypt) potrzebny jest klaster w chmurze z publicznym IP —
-lokalnie się nie da. Na klastrze zarządzanym (DigitalOcean/DOKS) instalacja z Kroku 1
-wygląda inaczej — patrz callout niżej oraz Przykład 4C.
+lokalnie się nie da. Na DigitalOcean (DOKS) **pomiń instalację z Kroku 1** i użyj
+wbudowanego Cilium — patrz callout niżej oraz Przykład 4C.
 
 ---
 
@@ -40,39 +40,17 @@ kubectl wait --timeout=180s -n envoy-gateway-system \
 `install.yaml` zawiera CRD-y Gateway API + Envoy Gateway. **Nie** tworzy `GatewayClass`
 — robi to `gateway-http.yaml` w Kroku 3.
 
-### Na klastrze zarządzanym (DigitalOcean/DOKS)
+### Na klastrze zarządzanym (DigitalOcean/DOKS) — nie instaluj Envoy
 
-Powyższa komenda tam **padnie**: DOKS ma własny Cilium z Gateway API, więc CRD-y Gateway API
-już istnieją i należą do dostawcy (`kubectl get crd gateways.gateway.networking.k8s.io -o jsonpath='{.metadata.labels}'`
-→ `doks.digitalocean.com/managed:true`, pin na starszą wersję). `install.yaml` v1.8.2 niesie
-nowsze CRD-y i server-side apply odbija je z `Apply failed with N conflicts: conflicts with "c3"`.
+DOKS ma wbudowany Cilium z włączonym Gateway API, więc kontrolera **nie instalujesz w ogóle** —
+`GatewayClass cilium` jest gotowa (`kubectl get gatewayclass` → `cilium  ...  Accepted  True`).
+Instalacja z Kroku 1 tam zresztą **padnie**: DOKS sam zarządza CRD-ami Gateway API (pin na
+starszą wersję, field manager `c3`), więc każdy instalator z własnymi CRD-ami Gateway API zderza
+się z `Apply failed ... conflicts with "c3"`.
 
-Na DOKS instaluj Envoy Gateway **Helmem** (tu wyjątkowo, bo Helm sam pomija istniejące CRD-y
-Gateway API, a doinstaluje własne `gateway.envoyproxy.io`) — dobierając wersję do Gateway API
-dostawcy (DOKS pinuje v1.2.1 → Envoy Gateway **v1.3.2**):
-
-```sh
-helm install eg oci://docker.io/envoyproxy/gateway-helm --version v1.3.2 \
-  -n envoy-gateway-system --create-namespace
-kubectl wait --timeout=180s -n envoy-gateway-system \
-  deployment/envoy-gateway --for=condition=Available
-
-# Weryfikacja — MUSI być 8 (to najczęstszy punkt awarii):
-kubectl get crd -o name | grep -c 'gateway.envoyproxy.io'
-```
-
-> **Nie** dawaj `--skip-crds`. Ta flaga pomija *wszystkie* CRD z chartu, w tym te 8
-> `gateway.envoyproxy.io`, których DOKS **nie** dostarcza — kontroler wstaje wtedy bez nich
-> i cicho odmawia pracy (`kubectl logs -n envoy-gateway-system deploy/envoy-gateway | grep 'CRD not found'`).
-> Jeśli tak się stało, dołóż je i zrestartuj kontroler:
-> ```sh
-> helm pull oci://docker.io/envoyproxy/gateway-helm --version v1.3.2 --untar
-> kubectl apply --server-side -f gateway-helm/crds/generated/   # --server-side: CRD envoyproxies > 256 kB
-> kubectl rollout restart deploy/envoy-gateway -n envoy-gateway-system
-> ```
-
-Na DOKS **pomiń** Kroki 2 i `kubectl patch gatewayclass` z Kroku 3 (to obejścia braku
-LoadBalancera w kind) — chmura sama nada Gateway'owi publiczny `EXTERNAL-IP`.
+Dlatego na DOKS **pomiń Kroki 1–3**. Zamiast `GatewayClass eg` + `gateway-http.yaml` użyj Gatewaya
+z `gatewayClassName: cilium` — DO sam nada mu publiczny `EXTERNAL-IP` (Service `cilium-gateway-<nazwa>`).
+Pełny, przetestowany przepis (HTTP → Let's Encrypt → HTTPS) jest w **Przykładzie 4C**.
 
 ---
 
@@ -193,30 +171,59 @@ kubectl -n cert-manager rollout status deploy/cert-manager
 
 Bez tej flagi Challenge wisi w `pending` z `gateway api is not enabled`.
 
-### 4C — Let's Encrypt na DigitalOcean (prawdziwy, zaufany cert)
+### 4C — Let's Encrypt na DigitalOcean (Cilium, prawdziwy zaufany cert)
 
-Wymaga Gateway z publicznym IP (patrz sekcja DOKS w Kroku 1). `tls/certmanager-letsencrypt.yaml`
-ma placeholder `<GATEWAY-IP>` — podstaw realny adres swojego Gatewaya:
+Na DOKS nie ma Envoy Gateway — używamy wbudowanego Cilium (patrz sekcja DOKS w Kroku 1).
+`gateway-http.yaml`/`gateway-https.yaml` są dla `eg`, więc tu Gateway definiujemy inline z
+`gatewayClassName: cilium`. Nazywamy go `training-gateway`, żeby `tls/certmanager-letsencrypt.yaml`
+(solver + HTTPRoute + Certificate) pasował bez zmian.
 
 ```sh
-kubectl apply -f gateway-http.yaml -f backends.yaml
+kubectl apply -f backends.yaml
+
+# 1) Gateway (listener HTTP) — DO nada publiczny EXTERNAL-IP
+kubectl apply -f - <<'EOF'
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata: { name: training-gateway, namespace: default }
+spec:
+  gatewayClassName: cilium
+  listeners:
+    - { name: http, protocol: HTTP, port: 80, allowedRoutes: { namespaces: { from: All } } }
+EOF
 kubectl wait --for=condition=Programmed gateway/training-gateway --timeout=180s
 IP=$(kubectl get gateway training-gateway -o jsonpath='{.status.addresses[0].value}')
 
-# Zanim ruszysz na prod: sprawdź, że ścieżka HTTP-01 jest drożna z internetu.
-# 404 = dobrze (odpowiada backend). connection refused/timeout = NIE wystawiaj jeszcze certu.
+# 2) pre-flight HTTP-01 (404 z backendu = ścieżka drożna; refused/timeout = NIE wystawiaj certu)
 curl -s -o /dev/null -w "%{http_code}\n" http://app.$IP.nip.io/.well-known/acme-challenge/probe
 
+# 3) issuer prod + Certificate + HTTPRoute (placeholder <GATEWAY-IP> -> realny IP)
 sed "s/<GATEWAY-IP>/$IP/g" tls/certmanager-letsencrypt.yaml | kubectl apply -f -
 kubectl wait --for=condition=Ready certificate/app-tls --timeout=5m
-kubectl apply -f gateway-https.yaml
+
+# 4) dorzuć listener HTTPS (Cilium terminuje TLS Secretem app-tls)
+kubectl apply -f - <<EOF
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata: { name: training-gateway, namespace: default }
+spec:
+  gatewayClassName: cilium
+  listeners:
+    - { name: http, protocol: HTTP, port: 80, allowedRoutes: { namespaces: { from: All } } }
+    - name: https
+      protocol: HTTPS
+      port: 443
+      hostname: app.$IP.nip.io
+      tls: { mode: Terminate, certificateRefs: [ { kind: Secret, name: app-tls } ] }
+      allowedRoutes: { namespaces: { from: All } }
+EOF
 
 curl -sv https://app.$IP.nip.io/ 2>&1 | grep -iE 'issuer:|subject:'
 # issuer: C=US; O=Let's Encrypt  -> zaufany łańcuch, curl BEZ -k
 ```
 
-> Plik używa od razu `letsencrypt-prod` — dostajesz zieloną kłódkę bez `-k`. Ceną jest limit
-> LE: **5 nieudanych walidacji na godzinę na hostname**, dlatego pre-flight `curl` wyżej.
+> Plik używa od razu `letsencrypt-prod` — zielona kłódka bez `-k`. Ceną jest limit LE:
+> **5 nieudanych walidacji na godzinę na hostname**, dlatego pre-flight `curl` w kroku 2.
 
 ---
 
@@ -231,6 +238,16 @@ kubectl delete secret app-tls --ignore-not-found
 kubectl delete -f tls/certmanager-selfsigned.yaml --ignore-not-found
 # (opcjonalnie) Envoy Gateway / cert-manager:
 # kubectl delete -f https://github.com/envoyproxy/gateway/releases/download/v1.8.2/install.yaml
+```
+
+Na **DOKS** (Przykład 4C, Cilium) — LoadBalancer DO kosztuje, więc po demie skasuj Gateway:
+
+```sh
+kubectl delete gateway training-gateway --ignore-not-found   # zwalnia LB DO
+kubectl delete httproute app-public --ignore-not-found
+kubectl delete certificate app-tls --ignore-not-found
+kubectl delete clusterissuer letsencrypt-prod --ignore-not-found
+kubectl delete secret app-tls --ignore-not-found
 ```
 
 ## Linki
