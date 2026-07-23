@@ -9,32 +9,13 @@
 # (solver tworzy HTTPRoute). Patrz ../README.md → sekcja TLS (jak włączyć bez Helma).
 #
 # UWAGA — poniżej jest PLACEHOLDER <GATEWAY-IP>. Podstaw adres SWOJEGO Gatewaya, inaczej
-# LE będzie walidować cudzy host. Gotowy przepis: tls/digitalocean.md
+# LE będzie walidować cudzy host. Gotowy przepis: ../README.md (Przykład 4C).
 #
 #   IP=$(kubectl get gateway training-gateway -o jsonpath='{.status.addresses[0].value}')
 #   sed "s/<GATEWAY-IP>/$IP/g" tls/certmanager-letsencrypt.yaml | kubectl apply -f -
 #
-# Staging (fake CA "Pretend Pear X1") — używaj do iteracji, nie ma rate-limitów.
-# Prod — DOPIERO gdy staging działa. Limit, który naprawdę boli, to 5 NIEUDANYCH
-# walidacji na godzinę na hostname: kilka błędnych podejść pod rząd blokuje demo.
-apiVersion: cert-manager.io/v1
-kind: ClusterIssuer
-metadata:
-  name: letsencrypt-staging
-spec:
-  acme:
-    server: https://acme-staging-v02.api.letsencrypt.org/directory
-    email: maciejkra@gmail.com
-    privateKeySecretRef:
-      name: letsencrypt-staging-account-key
-    solvers:
-      - http01:
-          gatewayHTTPRoute:
-            parentRefs:
-              - name: training-gateway
-                namespace: default
-                kind: Gateway
----
+# Używamy od razu prod — chcemy zaufany cert (zielona kłódka, curl bez -k). Cena: limit LE
+# to 5 NIEUDANYCH walidacji na godzinę na hostname, więc najpierw pre-flight z README (4C).
 apiVersion: cert-manager.io/v1
 kind: ClusterIssuer
 metadata:
@@ -63,10 +44,10 @@ spec:
   privateKey:
     rotationPolicy: Always       # od cert-manager v1.18 to nowy default — ustawiamy jawnie, by wyciszyć warning
   issuerRef:
-    name: letsencrypt-staging  # zacznij od staging; na letsencrypt-prod przełącz po sukcesie
+    name: letsencrypt-prod
     kind: ClusterIssuer
   dnsNames:
-    - app.<GATEWAY-IP>.nip.io   # musi wskazywać na Twój publiczny IP
+    - app.<GATEWAY-IP>.nip.io    # musi wskazywać na Twój publiczny IP
   duration: 2160h               # 90 dni
   renewBefore: 360h             # odnowienie 15 dni przed wygaśnięciem
 
