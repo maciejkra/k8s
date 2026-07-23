@@ -20,6 +20,11 @@ z włączonym Kubernetesem.
 
 > Porty `:80`/`:443` muszą być wolne na hoście — sprawdź `sudo lsof -nP -iTCP:80 -sTCP:LISTEN`.
 
+Do **Przykładu 4C** (Let's Encrypt) potrzebny jest klaster w chmurze z publicznym IP —
+lokalnie się nie da. Ścieżkę dla DigitalOcean (DOKS) opisuje
+[`tls/digitalocean.md`](tls/digitalocean.md); tam instalacja Envoy Gateway wygląda inaczej
+niż w Kroku 1 poniżej, bo DOKS sam zarządza CRD-ami Gateway API.
+
 ---
 
 ## Krok 1 — Instalacja Envoy Gateway (bez Helma)
@@ -35,6 +40,11 @@ kubectl wait --timeout=180s -n envoy-gateway-system \
 
 `install.yaml` zawiera CRD-y Gateway API + Envoy Gateway. **Nie** tworzy `GatewayClass`
 — robi to `gateway-http.yaml` w Kroku 3.
+
+> Na klastrze zarządzanym (DOKS, a bywa że i GKE/EKS z własnym kontrolerem) ta komenda
+> **padnie** — `install.yaml` niesie własne CRD-y Gateway API i zderza się z tymi, które
+> dostawca już zainstalował. Objaw: `Apply failed with N conflicts: conflicts with "..."`.
+> Patrz [`tls/digitalocean.md`](tls/digitalocean.md).
 
 ---
 
@@ -143,8 +153,9 @@ kubectl wait --timeout=180s -n cert-manager \
 ```
 
 Issuer `selfSigned` (4B) działa od razu. Let's Encrypt (4C) wymaga publicznego IP,
-więc lokalnie zostajemy przy 4A/4B. Na klastrze w chmurze cert-manager potrzebuje
-dodatkowo solvera Gateway (`gateway-shim`):
+więc lokalnie zostajemy przy 4A/4B — gotowy przepis na DOKS jest
+w [`tls/digitalocean.md`](tls/digitalocean.md). Na klastrze w chmurze cert-manager
+potrzebuje dodatkowo solvera Gateway (`gateway-shim`):
 
 ```sh
 kubectl -n cert-manager patch deploy cert-manager --type=json \
