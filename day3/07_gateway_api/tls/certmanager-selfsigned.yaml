@@ -22,6 +22,10 @@ spec:
   issuerRef:
     name: selfsigned
     kind: ClusterIssuer
+  # Bez commonName cert ma PUSTE pola subject i issuer (cert-manager wypełnia tylko SAN-y),
+  # a wtedy `curl -kv` pokazuje `subject: [NONE]` i w ogóle nie drukuje linii `issuer:` —
+  # nie da się na nim pokazać, że subject == issuer (patrz task.md, Część 4).
+  commonName: demo.127-0-0-1.nip.io
   dnsNames:
     - demo.127-0-0-1.nip.io
     - nginx.127-0-0-1.nip.io

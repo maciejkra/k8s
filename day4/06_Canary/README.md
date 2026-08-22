@@ -10,3 +10,7 @@ https://github.com/ContainerSolutions/k8s-deployment-strategies
 5. Create service for this deployment
 6. Create HTTPRoute attached to this service (use `training-gateway` from `day3/07_gateway_api`)
 7. Access through browser, traffic should hit both of them ~50% of time
+
+> Wymaga Gateway API z `day3/07_gateway_api` (`training-gateway`, `Programmed=True`).
+> Gotowe manifesty weighted HTTPRoute: `solution/`. Wariant z `backendRefs[].weight`
+> (70/30) i progresywny rollout: `task.md`.

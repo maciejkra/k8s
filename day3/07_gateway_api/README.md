@@ -31,7 +31,7 @@ wbudowanego Cilium — patrz callout niżej oraz Przykład 4C.
 Helm poznajemy dopiero w `day5/05_helm`, więc tu zwykły `kubectl apply`:
 
 ```sh
-kubectl apply --server-side -f https://github.com/envoyproxy/gateway/releases/download/v1.8.2/install.yaml
+kubectl apply --server-side -f https://github.com/envoyproxy/gateway/releases/download/v1.9.0/install.yaml
 
 kubectl wait --timeout=180s -n envoy-gateway-system \
   deployment/envoy-gateway --for=condition=Available
@@ -66,12 +66,6 @@ poda Envoya do control-plane i otwieramy na nim `hostPort`:
 ```sh
 kubectl apply -f envoyproxy-hostport.yaml
 ```
-
-> Envoy jako nie-root nie zbinduje portów <1024, więc nasłuchuje na **porcie listenera
-> +10000**: 80 → 10080, 443 → 10443. Stąd `hostPort: 80 → containerPort: 10080`.
-> Przepływ: `host:80 → node:80 (kind.yaml) → hostPort → Envoy:10080`.
-> Pod wyląduje na control-plane (jedyny node z `ingress-ready=true`); `toleration`
-> w pliku pozwala mu tam usiąść mimo taintu.
 
 ---
 
@@ -153,7 +147,7 @@ Patrz **[`tls/README.md`](tls/README.md)**: self-signed (openssl) → cert-manag
 ### cert-manager bez Helma (do Przykładu 4B/4C)
 
 ```sh
-kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.21.0/cert-manager.yaml
+kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.21.1/cert-manager.yaml
 kubectl wait --timeout=180s -n cert-manager \
   deployment/cert-manager deployment/cert-manager-webhook --for=condition=Available
 ```
@@ -197,8 +191,9 @@ IP=$(kubectl get gateway training-gateway -o jsonpath='{.status.addresses[0].val
 # 2) pre-flight HTTP-01 (404 z backendu = ścieżka drożna; refused/timeout = NIE wystawiaj certu)
 curl -s -o /dev/null -w "%{http_code}\n" http://app.$IP.nip.io/.well-known/acme-challenge/probe
 
-# 3) issuer prod + Certificate + HTTPRoute (placeholder <GATEWAY-IP> -> realny IP)
-sed "s/<GATEWAY-IP>/$IP/g" tls/certmanager-letsencrypt.yaml | kubectl apply -f -
+# 3) issuer prod + Certificate + HTTPRoute
+# W tls/certmanager-letsencrypt.yaml podmień <GATEWAY-IP> na IP wypisane wyżej.
+kubectl apply -f tls/certmanager-letsencrypt.yaml
 kubectl wait --for=condition=Ready certificate/app-tls --timeout=5m
 
 # 4) dorzuć listener HTTPS (Cilium terminuje TLS Secretem app-tls)
@@ -237,17 +232,7 @@ kubectl delete -f gateway-http.yaml --ignore-not-found
 kubectl delete secret app-tls --ignore-not-found
 kubectl delete -f tls/certmanager-selfsigned.yaml --ignore-not-found
 # (opcjonalnie) Envoy Gateway / cert-manager:
-# kubectl delete -f https://github.com/envoyproxy/gateway/releases/download/v1.8.2/install.yaml
-```
-
-Na **DOKS** (Przykład 4C, Cilium) — LoadBalancer DO kosztuje, więc po demie skasuj Gateway:
-
-```sh
-kubectl delete gateway training-gateway --ignore-not-found   # zwalnia LB DO
-kubectl delete httproute app-public --ignore-not-found
-kubectl delete certificate app-tls --ignore-not-found
-kubectl delete clusterissuer letsencrypt-prod --ignore-not-found
-kubectl delete secret app-tls --ignore-not-found
+# kubectl delete -f https://github.com/envoyproxy/gateway/releases/download/v1.9.0/install.yaml
 ```
 
 ## Linki

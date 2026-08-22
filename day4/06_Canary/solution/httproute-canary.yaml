@@ -1,0 +1,22 @@
+# Weighted canary — dwa backendRefs z polem `weight`: 70% demo-app (nginx), 30% echo-app.
+# Suma weight nie musi być 100; Envoy znormalizuje. Zmień wartości, re-apply —
+# Envoy przeprogramuje routing NATYCHMIAST, bez restartu Podów.
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: canary-task
+spec:
+  parentRefs:
+    - name: training-gateway     # Gateway z D3/07 (namespace default)
+  hostnames:
+    - canary.127-0-0-1.nip.io
+  rules:
+    - matches:
+        - path: { type: PathPrefix, value: / }
+      backendRefs:
+        - name: demo-app         # nginx z day3/07_gateway_api/backends.yaml
+          port: 80
+          weight: 70             # wersja stabilna — 70%
+        - name: echo-app         # echo-server z tego samego pliku
+          port: 80
+          weight: 30             # canary — 30%
