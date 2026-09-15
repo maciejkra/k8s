@@ -31,7 +31,7 @@ wbudowanego Cilium — patrz callout niżej oraz Przykład 4C.
 Helm poznajemy dopiero w `day5/05_helm`, więc tu zwykły `kubectl apply`:
 
 ```sh
-kubectl apply --server-side -f https://github.com/envoyproxy/gateway/releases/download/v1.9.0/install.yaml
+kubectl apply --server-side -f https://github.com/envoyproxy/gateway/releases/download/v1.9.1/install.yaml
 
 kubectl wait --timeout=180s -n envoy-gateway-system \
   deployment/envoy-gateway --for=condition=Available
@@ -147,7 +147,7 @@ Patrz **[`tls/README.md`](tls/README.md)**: self-signed (openssl) → cert-manag
 ### cert-manager bez Helma (do Przykładu 4B/4C)
 
 ```sh
-kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.21.1/cert-manager.yaml
+kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.21.2/cert-manager.yaml
 kubectl wait --timeout=180s -n cert-manager \
   deployment/cert-manager deployment/cert-manager-webhook --for=condition=Available
 ```
@@ -232,7 +232,7 @@ kubectl delete -f gateway-http.yaml --ignore-not-found
 kubectl delete secret app-tls --ignore-not-found
 kubectl delete -f tls/certmanager-selfsigned.yaml --ignore-not-found
 # (opcjonalnie) Envoy Gateway / cert-manager:
-# kubectl delete -f https://github.com/envoyproxy/gateway/releases/download/v1.9.0/install.yaml
+# kubectl delete -f https://github.com/envoyproxy/gateway/releases/download/v1.9.1/install.yaml
 ```
 
 ## Linki
