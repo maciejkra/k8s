@@ -3,7 +3,7 @@
 # Problem: kind nie ma cloud-providera, więc domyślny Service typu LoadBalancer
 # data-plane'u Envoya wisi w EXTERNAL-IP=<pending> i ruch z hosta go nie dosięga.
 #
-# Rozwiązanie (analogiczne do nodeSelector-patcha, który robiliśmy dla ingress-nginx):
+# Rozwiązanie:
 # przypinamy poda Envoya do node'a control-plane (jedyny z `ingress-ready=true`
 # i z mapowaniem portów 80/443 na host — patrz day2/04_k8s/kind.yaml) i otwieramy
 # na nim hostPort 80/443.

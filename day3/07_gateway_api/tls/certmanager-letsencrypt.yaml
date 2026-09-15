@@ -8,11 +8,8 @@
 # Dodatkowo dla Gateway API cert-manager musi mieć włączony gateway-shim
 # (solver tworzy HTTPRoute). Patrz ../README.md → sekcja TLS (jak włączyć bez Helma).
 #
-# UWAGA — poniżej jest PLACEHOLDER <GATEWAY-IP>. Podstaw adres SWOJEGO Gatewaya, inaczej
-# LE będzie walidować cudzy host. Gotowy przepis: ../README.md (Przykład 4C).
-#
-#   IP=$(kubectl get gateway training-gateway -o jsonpath='{.status.addresses[0].value}')
-#   sed "s/<GATEWAY-IP>/$IP/g" tls/certmanager-letsencrypt.yaml | kubectl apply -f -
+# UWAGA — poniżej jest PLACEHOLDER <GATEWAY-IP> (dwa miejsca). Podmień go na adres SWOJEGO
+# Gatewaya, inaczej LE będzie walidować cudzy host. Gotowy przepis: ../README.md (Przykład 4C).
 #
 # Używamy od razu prod — chcemy zaufany cert (zielona kłódka, curl bez -k). Cena: limit LE
 # to 5 NIEUDANYCH walidacji na godzinę na hostname, więc najpierw pre-flight z README (4C).

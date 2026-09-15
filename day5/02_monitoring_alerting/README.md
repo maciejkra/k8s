@@ -1,33 +1,46 @@
-## Install Loki via Helm
-Add Loki’s Helm Chart repository:
+## Install kube-prometheus-stack
 
+```sh
+helm upgrade --install --wait --timeout 15m \
+  --namespace monitoring --create-namespace \
+  --repo https://prometheus-community.github.io/helm-charts \
+  kube-prometheus-stack kube-prometheus-stack
 ```
+
+Retrieve the password to log into Grafana (user `admin`):
+```sh
+kubectl get secret -n monitoring kube-prometheus-stack-grafana \
+  -o jsonpath='{.data.admin-password}' | base64 --decode ; echo
+```
+
+Access the Grafana UI:
+```sh
+kubectl port-forward -n monitoring service/kube-prometheus-stack-grafana 3000:80
+```
+
+## Install Loki + Alloy via Helm
+
+```sh
 helm repo add grafana https://grafana.github.io/helm-charts
-```
-
-Run the following command to update the repository:
-
-```
 helm repo update
+
+# backend
+helm upgrade --install loki grafana/loki \
+  --namespace loki --create-namespace -f loki-values.yaml --timeout 10m
+
+# kolektor logów
+helm upgrade --install alloy grafana/alloy \
+  --namespace alloy --create-namespace -f alloy-values.yaml
 ```
 
-Deploy the Loki stack:
-```
-helm upgrade --install loki grafana/loki-stack  --set grafana.enabled=true,prometheus.enabled=true,prometheus.alertmanager.persistentVolume.enabled=false,prometheus.server.persistentVolume.enabled=false --namespace=loki --create-namespace
-```
-> `loki-stack` jest oznaczony przez Grafana Labs jako deprecated (wciąż działa, ale
-> instaluje Loki 2.9). Następca to osobne charty `grafana/loki` + `grafana/alloy`.
-This will install Loki, Grafana and Promtail into your Kubernetes cluster.
+Dodaj w Grafanie data source typu **Loki** pod adresem:
 
-Retrieve the password to log into Grafana:
 ```
-kubectl get secret loki-grafana --namespace=loki -o jsonpath="{.data.admin-password}" | base64 --decode ; echo
-```
-The generated admin password will look like this one -> `<40-znakowy losowy ciąg>`
-
-Finally, execute the command below to access the Grafana UI.
-```
-kubectl port-forward --namespace loki service/loki-grafana 3000:80
+http://loki-gateway.loki.svc.cluster.local/
 ```
 
-https://grafana.com/docs/loki/latest/installation/helm/?pg=get&plcmt=selfmanaged-box2-cta2
+Sprawdź w Grafanie → Explore → Loki, np. `{namespace="kube-system"}`.
+
+## Linki
+- [Loki Helm chart](https://grafana.com/docs/loki/latest/setup/install/helm/)
+- [Grafana Alloy](https://grafana.com/docs/alloy/latest/)

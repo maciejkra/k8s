@@ -2,6 +2,10 @@
 
 prepare the nodes and lunch `prepare.sh` on each of them - it will prepare the nodes for installation
 
+On the first node:
+```sh
+kubeadm init
+```
 
 **Save the output `kubeadm join` commands**
 
@@ -18,7 +22,7 @@ sudo tar xzvfC cilium-linux-${CLI_ARCH}.tar.gz /usr/local/bin
 rm cilium-linux-${CLI_ARCH}.tar.gz{,.sha256sum}
 
 export KUBECONFIG=/etc/kubernetes/admin.conf
-cilium install --version 1.16.4
+cilium install --version 1.20.1
 ```
 
 # On first node

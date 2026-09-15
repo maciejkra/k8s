@@ -1,0 +1,41 @@
+# Grafana Alloy — kolektor logow Podow.
+#
+# loki.source.kubernetes czyta logi przez API Kubernetesa, a nie z dysku node'a.
+# Dlatego Alloy zbiera logi Podow z CALEGO klastra, takze z control-plane, mimo ze
+# DaemonSet nie ma tam Poda (brak tolerancji na taint). Kolektory czytajace pliki
+# z dysku wymagaja Poda na kazdym wezle plus montowan z hosta.
+controller:
+  type: daemonset
+alloy:
+  configMap:
+    content: |
+      discovery.kubernetes "pods" {
+        role = "pod"
+      }
+
+      discovery.relabel "pods" {
+        targets = discovery.kubernetes.pods.targets
+        rule {
+          source_labels = ["__meta_kubernetes_namespace"]
+          target_label  = "namespace"
+        }
+        rule {
+          source_labels = ["__meta_kubernetes_pod_name"]
+          target_label  = "pod"
+        }
+        rule {
+          source_labels = ["__meta_kubernetes_pod_container_name"]
+          target_label  = "container"
+        }
+      }
+
+      loki.source.kubernetes "pods" {
+        targets    = discovery.relabel.pods.output
+        forward_to = [loki.write.default.receiver]
+      }
+
+      loki.write "default" {
+        endpoint {
+          url = "http://loki-gateway.loki.svc.cluster.local/loki/api/v1/push"
+        }
+      }
