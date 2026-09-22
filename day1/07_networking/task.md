@@ -18,21 +18,3 @@ curl -XPOST 127.0.0.1:5002/api/v1/info
 curl -XPOST 127.0.0.1:5002/api/v1/info
 curl 127.0.0.1:5002/api/v1/info
 ```
-
-# How redis handle data
-
-- list volume - find one created by redis
-*Use  container inspect*
-```
--f "{{ (index .Mounts 0).Name }}"
-```
-- STOP container
-- wait...
-- Remove container
-
-- find mount point with inspect using
-*Use image inspect*
-```
- -f "{{.ContainerConfig.Volumes}}"
-```
-- create redis again attached to volume - check counter
