@@ -23,8 +23,8 @@ hostNetwork: true
 # Kube Prometheus
 
 ```sh
-# release-0.18 — najnowsza gałąź; macierz zgodności: Kubernetes 1.33-1.36
-git clone --depth 1 -b release-0.18 https://github.com/prometheus-operator/kube-prometheus.git
+# release-0.19 — najnowsza gałąź; macierz zgodności: Kubernetes 1.35-1.37
+git clone --depth 1 -b release-0.19 https://github.com/prometheus-operator/kube-prometheus.git
 cd kube-prometheus
 kubectl apply --server-side -f manifests/setup
 until kubectl get servicemonitors --all-namespaces ; do date; sleep 1; echo ""; done

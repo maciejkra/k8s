@@ -7,7 +7,7 @@ To run:
 
 ```shell
 $ ARCH=$(docker info --format '{{.Architecture}}' | sed 's/x86_64/amd64/;s/aarch64/arm64/')
-$ docker plugin install grafana/loki-docker-driver:3.7.7-$ARCH --alias loki --grant-all-permissions
+$ docker plugin install grafana/loki-docker-driver:3.7.9-$ARCH --alias loki --grant-all-permissions
 $ docker compose up -d
 ```
 
